@@ -117,7 +117,7 @@ const PatientFilter: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-6xl mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <Button
           onClick={handleFilterToggle}
@@ -137,54 +137,61 @@ const PatientFilter: React.FC = () => {
       {isFilterOpen && (
         <div className="border border-border rounded-lg p-6 bg-card shadow-sm">
           <div className="space-y-4">
-            <div className="relative">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Type or paste patient IDs (e.g., PT001, PT002...)"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  onPaste={handlePaste}
-                  className="pl-10 h-20 text-base resize-none"
-                  style={{ minHeight: '80px' }}
-                />
+            <div className="flex gap-6">
+              {/* Left side - Search field (smaller width) */}
+              <div className="flex-1 max-w-md">
+                <div className="relative">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder="Type or paste patient IDs (e.g., PT001, PT002...)"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      onPaste={handlePaste}
+                      className="pl-10 h-20 text-base resize-none"
+                      style={{ minHeight: '80px' }}
+                    />
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground mt-2">
+                    You can select up to 15 patients maximum. Type patient ID or name to search.
+                  </p>
+                </div>
               </div>
-              
-              <p className="text-xs text-muted-foreground mt-2">
-                You can select up to 15 patients maximum. Type patient ID or name to search.
-              </p>
 
-              {/* Suggestions Dropdown */}
+              {/* Right side - Suggestions */}
               {showSuggestions && suggestions.length > 0 && (
-                <div
-                  ref={suggestionsRef}
-                  className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto"
-                >
-                  <div className="p-2">
-                    <div className="text-xs text-muted-foreground mb-2 px-2">
-                      Found {suggestions.length} matching patients
+                <div className="flex-1 max-w-md">
+                  <div
+                    ref={suggestionsRef}
+                    className="bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto"
+                  >
+                    <div className="p-2">
+                      <div className="text-xs text-muted-foreground mb-2 px-2">
+                        Found {suggestions.length} matching patients
+                      </div>
+                      {suggestions.map((patient, index) => (
+                        <button
+                          key={patient.id}
+                          onClick={() => handleSelectPatient(patient)}
+                          className={`w-full text-left p-3 rounded-md hover:bg-accent transition-colors ${
+                            index === highlightedIndex ? 'bg-accent' : ''
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-sm">{patient.id}</div>
+                              <div className="text-sm text-muted-foreground">{patient.name}</div>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {patient.status === 'active' ? '🟢' : '🔴'} {patient.status}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
                     </div>
-                    {suggestions.map((patient, index) => (
-                      <button
-                        key={patient.id}
-                        onClick={() => handleSelectPatient(patient)}
-                        className={`w-full text-left p-3 rounded-md hover:bg-accent transition-colors ${
-                          index === highlightedIndex ? 'bg-accent' : ''
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium text-sm">{patient.id}</div>
-                            <div className="text-sm text-muted-foreground">{patient.name}</div>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {patient.status === 'active' ? '🟢' : '🔴'} {patient.status}
-                          </div>
-                        </div>
-                      </button>
-                    ))}
                   </div>
                 </div>
               )}
