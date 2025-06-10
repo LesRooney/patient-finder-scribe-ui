@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Filter, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ const PatientFilter: React.FC = () => {
         !selectedPatients.some(selected => selected.id === patient.id) &&
         (patient.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
          patient.name.toLowerCase().includes(searchQuery.toLowerCase()))
-      ).slice(0, 10); // Limit to 10 suggestions
+      ).slice(0, 10);
       
       setSuggestions(filtered);
       setShowSuggestions(filtered.length > 0);
@@ -39,7 +40,7 @@ const PatientFilter: React.FC = () => {
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!showSuggestions) return;
+      if (!showSuggestions && e.key !== 'Enter') return;
 
       switch (e.key) {
         case 'ArrowDown':
@@ -56,6 +57,16 @@ const PatientFilter: React.FC = () => {
           e.preventDefault();
           if (highlightedIndex >= 0 && suggestions[highlightedIndex]) {
             handleSelectPatient(suggestions[highlightedIndex]);
+          } else if (searchQuery.trim()) {
+            // Try to find exact match by ID or name
+            const exactMatch = mockPatients.find(patient => 
+              !selectedPatients.some(selected => selected.id === patient.id) &&
+              (patient.id.toLowerCase() === searchQuery.toLowerCase() ||
+               patient.name.toLowerCase() === searchQuery.toLowerCase())
+            );
+            if (exactMatch) {
+              handleSelectPatient(exactMatch);
+            }
           }
           break;
         case 'Escape':
@@ -67,15 +78,13 @@ const PatientFilter: React.FC = () => {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showSuggestions, suggestions, highlightedIndex]);
+  }, [showSuggestions, suggestions, highlightedIndex, searchQuery, selectedPatients]);
 
   const handleFilterToggle = () => {
     setIsFilterOpen(!isFilterOpen);
     if (!isFilterOpen) {
-      // Focus search input when opening
       setTimeout(() => searchInputRef.current?.focus(), 100);
     } else {
-      // Clear search when closing
       setSearchQuery('');
       setShowSuggestions(false);
     }
@@ -83,7 +92,7 @@ const PatientFilter: React.FC = () => {
 
   const handleSelectPatient = (patient: Patient) => {
     if (selectedPatients.length >= 15) {
-      return; // Don't add if limit reached
+      return;
     }
     
     setSelectedPatients(prev => [...prev, patient]);
@@ -116,6 +125,11 @@ const PatientFilter: React.FC = () => {
     e.preventDefault();
   };
 
+  const handleApply = () => {
+    console.log('Applied filters with patients:', selectedPatients.map(p => p.id));
+    setIsFilterOpen(false);
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto relative" ref={filterRef}>
       <div className="flex items-center gap-4 mb-6">
@@ -135,10 +149,10 @@ const PatientFilter: React.FC = () => {
       </div>
 
       {isFilterOpen && (
-        <div className="absolute top-16 left-0 right-0 z-50 bg-popover border border-border rounded-lg shadow-lg p-6">
-          <div className="flex gap-6">
-            {/* Left side - Search field with embedded tags */}
-            <div className="flex-1 max-w-md">
+        <div className="absolute top-16 left-0 right-0 z-50 flex gap-6">
+          {/* Left side - Compact search dropdown */}
+          <div className="w-80">
+            <div className="bg-popover border border-border rounded-lg shadow-lg p-4">
               <div className="relative">
                 <div className="relative border border-input rounded-md bg-background min-h-20 p-3 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
                   <div className="flex flex-wrap gap-1 mb-2">
@@ -155,7 +169,7 @@ const PatientFilter: React.FC = () => {
                     <input
                       ref={searchInputRef}
                       type="text"
-                      placeholder={selectedPatients.length === 0 ? "Type or paste patient IDs (e.g., PT001, PT002...)" : "Add more patients..."}
+                      placeholder={selectedPatients.length === 0 ? "Type or paste patient IDs..." : "Add more patients..."}
                       value={searchQuery}
                       onChange={handleSearchChange}
                       onPaste={handlePaste}
@@ -165,68 +179,77 @@ const PatientFilter: React.FC = () => {
                 </div>
                 
                 <p className="text-xs text-muted-foreground mt-2">
-                  You can select up to 15 patients maximum. Type patient ID or name to search.
+                  Press Enter to add patient. Up to 15 patients maximum.
                 </p>
               </div>
-            </div>
 
-            {/* Right side - Suggestions */}
-            {showSuggestions && suggestions.length > 0 && (
-              <div className="flex-1 max-w-md">
-                <div
-                  ref={suggestionsRef}
-                  className="bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto"
-                >
-                  <div className="p-2">
-                    <div className="text-xs text-muted-foreground mb-2 px-2">
-                      Found {suggestions.length} matching patients
-                    </div>
-                    {suggestions.map((patient, index) => (
-                      <button
-                        key={patient.id}
-                        onClick={() => handleSelectPatient(patient)}
-                        className={`w-full text-left p-3 rounded-md hover:bg-accent transition-colors ${
-                          index === highlightedIndex ? 'bg-accent' : ''
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium text-sm">{patient.id}</div>
-                            <div className="text-sm text-muted-foreground">{patient.name}</div>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {patient.status === 'active' ? '🟢' : '🔴'} {patient.status}
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+              {selectedPatients.length > 0 && (
+                <div className="flex items-center justify-between mt-4 mb-4">
+                  <span className="text-sm text-muted-foreground">
+                    {selectedPatients.length} of 15 patients selected
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedPatients([])}
+                    className="text-xs"
+                  >
+                    Clear All
+                  </Button>
                 </div>
+              )}
+
+              {selectedPatients.length >= 15 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4">
+                  <p className="text-sm text-yellow-800">
+                    You've reached the maximum limit of 15 patients.
+                  </p>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button onClick={handleApply} className="flex-1">
+                  Apply Filter
+                </Button>
+                <Button variant="outline" onClick={() => setIsFilterOpen(false)}>
+                  Cancel
+                </Button>
               </div>
-            )}
+            </div>
           </div>
 
-          {selectedPatients.length > 0 && (
-            <div className="flex items-center justify-between mt-4">
-              <span className="text-sm text-muted-foreground">
-                {selectedPatients.length} of 15 patients selected
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedPatients([])}
-                className="text-xs"
+          {/* Right side - Suggestions */}
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="flex-1 max-w-md">
+              <div
+                ref={suggestionsRef}
+                className="bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto"
               >
-                Clear All
-              </Button>
-            </div>
-          )}
-
-          {selectedPatients.length >= 15 && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mt-4">
-              <p className="text-sm text-yellow-800">
-                You've reached the maximum limit of 15 patients. Remove some patients to add new ones.
-              </p>
+                <div className="p-2">
+                  <div className="text-xs text-muted-foreground mb-2 px-2">
+                    Found {suggestions.length} matching patients
+                  </div>
+                  {suggestions.map((patient, index) => (
+                    <button
+                      key={patient.id}
+                      onClick={() => handleSelectPatient(patient)}
+                      className={`w-full text-left p-3 rounded-md hover:bg-accent transition-colors ${
+                        index === highlightedIndex ? 'bg-accent' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium text-sm">{patient.id}</div>
+                          <div className="text-sm text-muted-foreground">{patient.name}</div>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {patient.status === 'active' ? '🟢' : '🔴'} {patient.status}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
