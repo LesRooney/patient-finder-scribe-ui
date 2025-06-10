@@ -138,21 +138,31 @@ const PatientFilter: React.FC = () => {
         <div className="border border-border rounded-lg p-6 bg-card shadow-sm">
           <div className="space-y-4">
             <div className="flex gap-6">
-              {/* Left side - Search field (smaller width) */}
+              {/* Left side - Search field with embedded tags */}
               <div className="flex-1 max-w-md">
                 <div className="relative">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      ref={searchInputRef}
-                      type="text"
-                      placeholder="Type or paste patient IDs (e.g., PT001, PT002...)"
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      onPaste={handlePaste}
-                      className="pl-10 h-20 text-base resize-none"
-                      style={{ minHeight: '80px' }}
-                    />
+                  <div className="relative border border-input rounded-md bg-background min-h-20 p-3 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {selectedPatients.map(patient => (
+                        <PatientTag
+                          key={patient.id}
+                          patient={patient}
+                          onRemove={handleRemovePatient}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex items-center">
+                      <Search className="h-4 w-4 text-muted-foreground mr-2 flex-shrink-0" />
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        placeholder={selectedPatients.length === 0 ? "Type or paste patient IDs (e.g., PT001, PT002...)" : "Add more patients..."}
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onPaste={handlePaste}
+                        className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground"
+                      />
+                    </div>
                   </div>
                   
                   <p className="text-xs text-muted-foreground mt-2">
@@ -197,29 +207,19 @@ const PatientFilter: React.FC = () => {
               )}
             </div>
 
-            {/* Selected Patients */}
             {selectedPatients.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium">Selected Patients ({selectedPatients.length}/15)</h3>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedPatients([])}
-                    className="text-xs"
-                  >
-                    Clear All
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {selectedPatients.map(patient => (
-                    <PatientTag
-                      key={patient.id}
-                      patient={patient}
-                      onRemove={handleRemovePatient}
-                    />
-                  ))}
-                </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  {selectedPatients.length} of 15 patients selected
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedPatients([])}
+                  className="text-xs"
+                >
+                  Clear All
+                </Button>
               </div>
             )}
 
