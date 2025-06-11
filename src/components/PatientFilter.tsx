@@ -13,6 +13,7 @@ const PatientFilter: React.FC = () => {
   const [suggestions, setSuggestions] = useState<Patient[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -134,6 +135,14 @@ const PatientFilter: React.FC = () => {
     setSelectedPatients([]);
   };
 
+  const handleSearchFocus = () => {
+    setIsSearchFocused(true);
+  };
+
+  const handleSearchBlur = () => {
+    setIsSearchFocused(false);
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto relative" ref={filterRef}>
       <div className="flex items-center gap-4 mb-6">
@@ -153,10 +162,12 @@ const PatientFilter: React.FC = () => {
       {isFilterOpen && (
         <div className="absolute top-16 left-0 right-0 z-50 flex gap-3">
           {/* Left side - Compact search dropdown */}
-          <div className="w-96">
+          <div className="w-[480px]">
             <div className="bg-popover border border-border rounded-lg shadow-lg p-4">
               <div className="relative">
-                <div className="relative border border-input rounded-md bg-background min-h-28 p-3 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-blue-500">
+                <div className={`relative border rounded-md bg-background min-h-40 p-3 transition-colors ${
+                  isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
+                }`}>
                   <div className="flex flex-wrap gap-1 mb-2">
                     {selectedPatients.map(patient => (
                       <PatientTag
@@ -180,24 +191,24 @@ const PatientFilter: React.FC = () => {
                     <input
                       ref={searchInputRef}
                       type="text"
-                      placeholder={selectedPatients.length === 0 ? "Type or paste patient IDs..." : "Add more patients..."}
+                      placeholder="Type or paste patient IDs..."
                       value={searchQuery}
                       onChange={handleSearchChange}
                       onPaste={handlePaste}
+                      onFocus={handleSearchFocus}
+                      onBlur={handleSearchBlur}
                       className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between mt-2 mb-3">
+                <div className="flex items-center justify-between mt-3 mb-4">
                   <p className="text-xs text-muted-foreground">
-                    {selectedPatients.length === 0 && !searchQuery.trim() ? "Press Enter to add patient. Up to 15 patients maximum." : ""}
+                    Press Enter to add patient. Up to 15 patients maximum.
                   </p>
-                  {selectedPatients.length > 0 && (
-                    <span className="text-xs text-muted-foreground ml-auto">
-                      {selectedPatients.length} / 15
-                    </span>
-                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {selectedPatients.length} / 15
+                  </span>
                 </div>
               </div>
 
@@ -216,8 +227,8 @@ const PatientFilter: React.FC = () => {
           </div>
 
           {/* Right side - Suggestions */}
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="w-64">
+          {(showSuggestions || searchQuery.trim()) && suggestions.length > 0 && (
+            <div className="w-56">
               <div
                 ref={suggestionsRef}
                 className="bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto"
