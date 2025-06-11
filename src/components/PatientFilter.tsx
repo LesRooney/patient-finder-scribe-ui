@@ -1,5 +1,6 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Filter, Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { mockPatients, Patient } from '../data/mockPatients';
@@ -129,18 +130,20 @@ const PatientFilter: React.FC = () => {
     setIsFilterOpen(false);
   };
 
+  const handleClearAll = () => {
+    setSelectedPatients([]);
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto relative" ref={filterRef}>
       <div className="flex items-center gap-4 mb-6">
         <Button
           onClick={handleFilterToggle}
-          variant={isFilterOpen ? "default" : "outline"}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
         >
-          <Filter size={18} />
-          Patient ID Filter
+          Patient ID
           {selectedPatients.length > 0 && (
-            <span className="ml-2 bg-primary-foreground text-primary px-2 py-0.5 rounded-full text-xs font-medium">
+            <span className="ml-2 bg-white text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium">
               {selectedPatients.length}
             </span>
           )}
@@ -150,7 +153,7 @@ const PatientFilter: React.FC = () => {
       {isFilterOpen && (
         <div className="absolute top-16 left-0 right-0 z-50 flex gap-3">
           {/* Left side - Compact search dropdown */}
-          <div className="w-80">
+          <div className="w-96">
             <div className="bg-popover border border-border rounded-lg shadow-lg p-4">
               <div className="relative">
                 <div className="relative border border-input rounded-md bg-background min-h-28 p-3 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-blue-500">
@@ -162,6 +165,15 @@ const PatientFilter: React.FC = () => {
                         onRemove={handleRemovePatient}
                       />
                     ))}
+                    {selectedPatients.length > 0 && (
+                      <button
+                        onClick={handleClearAll}
+                        className="inline-flex items-center justify-center w-5 h-5 bg-gray-400 hover:bg-gray-500 rounded-full transition-colors"
+                        aria-label="Clear all patients"
+                      >
+                        <X size={10} className="text-white" />
+                      </button>
+                    )}
                   </div>
                   <div className="flex items-start">
                     <Search className="h-4 w-4 text-muted-foreground mr-2 flex-shrink-0 mt-1" />
@@ -177,26 +189,17 @@ const PatientFilter: React.FC = () => {
                   </div>
                 </div>
                 
-                <p className="text-xs text-muted-foreground mt-2 mb-3">
-                  Press Enter to add patient. Up to 15 patients maximum.
-                </p>
-              </div>
-
-              {selectedPatients.length > 0 && (
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-muted-foreground">
-                    {selectedPatients.length} of 15 patients selected
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedPatients([])}
-                    className="text-xs"
-                  >
-                    Clear All
-                  </Button>
+                <div className="flex items-center justify-between mt-2 mb-3">
+                  <p className="text-xs text-muted-foreground">
+                    {selectedPatients.length === 0 && !searchQuery.trim() ? "Press Enter to add patient. Up to 15 patients maximum." : ""}
+                  </p>
+                  {selectedPatients.length > 0 && (
+                    <span className="text-xs text-muted-foreground ml-auto">
+                      {selectedPatients.length} / 15
+                    </span>
+                  )}
                 </div>
-              )}
+              </div>
 
               {selectedPatients.length >= 15 && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-3">
