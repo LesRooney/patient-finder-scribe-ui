@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -137,10 +136,19 @@ const PatientFilter: React.FC = () => {
 
   const handleSearchFocus = () => {
     setIsSearchFocused(true);
+    // Show suggestions with all available patients when focusing
+    if (!searchQuery.trim()) {
+      const availablePatients = mockPatients.filter(patient => 
+        !selectedPatients.some(selected => selected.id === patient.id)
+      ).slice(0, 10);
+      setSuggestions(availablePatients);
+      setShowSuggestions(availablePatients.length > 0);
+    }
   };
 
   const handleSearchBlur = () => {
     setIsSearchFocused(false);
+    // Keep suggestions visible but don't hide them immediately
   };
 
   return (
@@ -161,11 +169,11 @@ const PatientFilter: React.FC = () => {
 
       {isFilterOpen && (
         <div className="absolute top-16 left-0 right-0 z-50 flex gap-3">
-          {/* Left side - Compact search dropdown */}
-          <div className="w-[480px]">
-            <div className="bg-popover border border-border rounded-lg shadow-lg p-4">
+          {/* Left side - Search container */}
+          <div className="w-[580px]">
+            <div className="bg-popover border border-border rounded-lg shadow-lg p-4 min-h-[280px]">
               <div className="relative">
-                <div className={`relative border rounded-md bg-background min-h-40 p-3 transition-colors ${
+                <div className={`relative border rounded-md bg-background min-h-[188px] p-3 transition-colors ${
                   isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
                 }`}>
                   <div className="flex flex-wrap gap-1 mb-2">
@@ -202,11 +210,11 @@ const PatientFilter: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between mt-3 mb-4">
-                  <p className="text-xs text-muted-foreground">
-                    Press Enter to add patient. Up to 15 patients maximum.
+                <div className="flex items-start justify-between mt-3 mb-4 gap-4">
+                  <p className="text-xs text-muted-foreground flex-1">
+                    Paste, search, or filter up to 15 patients maximum. Press Enter to add individually.
                   </p>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
                     {selectedPatients.length} / 15
                   </span>
                 </div>
@@ -227,11 +235,11 @@ const PatientFilter: React.FC = () => {
           </div>
 
           {/* Right side - Suggestions */}
-          {(showSuggestions || searchQuery.trim()) && suggestions.length > 0 && (
+          {(isSearchFocused || searchQuery.trim()) && suggestions.length > 0 && (
             <div className="w-56">
               <div
                 ref={suggestionsRef}
-                className="bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto"
+                className="bg-popover border border-border rounded-md shadow-lg min-h-[280px] overflow-y-auto"
               >
                 <div className="p-2">
                   <div className="text-xs text-muted-foreground mb-2 px-2">
