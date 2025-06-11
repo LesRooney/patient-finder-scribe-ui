@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Filter, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -149,12 +148,12 @@ const PatientFilter: React.FC = () => {
       </div>
 
       {isFilterOpen && (
-        <div className="absolute top-16 left-0 right-0 z-50 flex gap-6">
+        <div className="absolute top-16 left-0 right-0 z-50 flex gap-3">
           {/* Left side - Compact search dropdown */}
           <div className="w-80">
             <div className="bg-popover border border-border rounded-lg shadow-lg p-4">
               <div className="relative">
-                <div className="relative border border-input rounded-md bg-background min-h-20 p-3 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                <div className="relative border border-input rounded-md bg-background min-h-28 p-3 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-blue-500">
                   <div className="flex flex-wrap gap-1 mb-2">
                     {selectedPatients.map(patient => (
                       <PatientTag
@@ -164,8 +163,8 @@ const PatientFilter: React.FC = () => {
                       />
                     ))}
                   </div>
-                  <div className="flex items-center">
-                    <Search className="h-4 w-4 text-muted-foreground mr-2 flex-shrink-0" />
+                  <div className="flex items-start">
+                    <Search className="h-4 w-4 text-muted-foreground mr-2 flex-shrink-0 mt-1" />
                     <input
                       ref={searchInputRef}
                       type="text"
@@ -178,13 +177,13 @@ const PatientFilter: React.FC = () => {
                   </div>
                 </div>
                 
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="text-xs text-muted-foreground mt-2 mb-3">
                   Press Enter to add patient. Up to 15 patients maximum.
                 </p>
               </div>
 
               {selectedPatients.length > 0 && (
-                <div className="flex items-center justify-between mt-4 mb-4">
+                <div className="flex items-center justify-between mb-3">
                   <span className="text-sm text-muted-foreground">
                     {selectedPatients.length} of 15 patients selected
                   </span>
@@ -200,27 +199,22 @@ const PatientFilter: React.FC = () => {
               )}
 
               {selectedPatients.length >= 15 && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-3">
                   <p className="text-sm text-yellow-800">
                     You've reached the maximum limit of 15 patients.
                   </p>
                 </div>
               )}
 
-              <div className="flex gap-2">
-                <Button onClick={handleApply} className="flex-1">
-                  Apply Filter
-                </Button>
-                <Button variant="outline" onClick={() => setIsFilterOpen(false)}>
-                  Cancel
-                </Button>
-              </div>
+              <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                Apply
+              </Button>
             </div>
           </div>
 
           {/* Right side - Suggestions */}
           {showSuggestions && suggestions.length > 0 && (
-            <div className="flex-1 max-w-md">
+            <div className="w-64">
               <div
                 ref={suggestionsRef}
                 className="bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto"
@@ -237,15 +231,7 @@ const PatientFilter: React.FC = () => {
                         index === highlightedIndex ? 'bg-accent' : ''
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium text-sm">{patient.id}</div>
-                          <div className="text-sm text-muted-foreground">{patient.name}</div>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {patient.status === 'active' ? '🟢' : '🔴'} {patient.status}
-                        </div>
-                      </div>
+                      <div className="font-medium text-sm">{patient.id}</div>
                     </button>
                   ))}
                 </div>
