@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -173,7 +172,20 @@ const PatientFilterA: React.FC = () => {
                   <div className="absolute top-3 left-3">
                     <Search className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <div className="flex flex-wrap gap-1 mb-2 ml-8 mr-3 mt-3">
+                  <div className="absolute top-3 left-8 right-3">
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder="Type or paste patient IDs..."
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      onPaste={handlePaste}
+                      onFocus={handleSearchFocus}
+                      onBlur={handleSearchBlur}
+                      className="w-full bg-transparent outline-none text-base placeholder:text-muted-foreground"
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-1 mb-2 ml-8 mr-3 mt-8">
                     {selectedPatients.map(patient => (
                       <PatientTag
                         key={patient.id}
@@ -190,19 +202,6 @@ const PatientFilterA: React.FC = () => {
                         <X size={10} className="text-white" />
                       </button>
                     )}
-                  </div>
-                  <div className="absolute bottom-3 left-8 right-3">
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      placeholder="Type or paste patient IDs..."
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      onPaste={handlePaste}
-                      onFocus={handleSearchFocus}
-                      onBlur={handleSearchBlur}
-                      className="w-full bg-transparent outline-none text-base placeholder:text-muted-foreground"
-                    />
                   </div>
                 </div>
                 
@@ -225,6 +224,13 @@ const PatientFilterA: React.FC = () => {
                   </p>
                 </div>
               )}
+
+              <div style={{ height: '8px' }}></div>
+
+              {/* Apply button in the middle */}
+              <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                Apply
+              </Button>
             </div>
 
             <div style={{ height: '8px' }}></div>
@@ -237,13 +243,13 @@ const PatientFilterA: React.FC = () => {
                     {suggestions.length > 0 ? `Found ${suggestions.length} matching patients` : 'No matches found'}
                   </div>
                   {suggestions.length > 0 && (
-                    <div className="max-h-60 overflow-y-auto">
-                      {suggestions.map((patient, index) => (
+                    <div className="max-h-40 overflow-y-auto">
+                      {suggestions.slice(0, 5).map((patient, index) => (
                         <button
                           key={patient.id}
                           onClick={() => handleSelectPatient(patient)}
                           className={`w-full text-left p-3 rounded-md hover:bg-accent transition-colors ${
-                            index === highlightedIndex ? 'bg-accent' : ''
+                            index === highlightedIndex ?  'bg-accent' : ''
                           }`}
                         >
                           <div className="font-medium text-sm">{patient.id}</div>
@@ -254,15 +260,6 @@ const PatientFilterA: React.FC = () => {
                 </div>
               </div>
             )}
-
-            <div style={{ height: '8px' }}></div>
-
-            {/* Apply button at bottom */}
-            <div className="border-t border-border p-4">
-              <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                Apply
-              </Button>
-            </div>
           </div>
         </div>
       )}
