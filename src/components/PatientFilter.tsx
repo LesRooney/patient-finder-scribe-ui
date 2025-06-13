@@ -14,6 +14,7 @@ const PatientFilter: React.FC = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -88,6 +89,7 @@ const PatientFilter: React.FC = () => {
     } else {
       setSearchQuery('');
       setShowSuggestions(false);
+      setHasInteracted(false);
     }
   };
 
@@ -109,6 +111,9 @@ const PatientFilter: React.FC = () => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+    if (!hasInteracted) {
+      setHasInteracted(true);
+    }
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
@@ -137,6 +142,9 @@ const PatientFilter: React.FC = () => {
 
   const handleSearchFocus = () => {
     setIsSearchFocused(true);
+    if (!hasInteracted) {
+      setHasInteracted(true);
+    }
   };
 
   const handleSearchBlur = () => {
@@ -161,97 +169,99 @@ const PatientFilter: React.FC = () => {
 
       {isFilterOpen && (
         <div className="absolute top-16 left-0 right-0 z-50 flex gap-3">
-          {/* Left side - Compact search dropdown */}
-          <div className="w-[480px]">
-            <div className="bg-popover border border-border rounded-lg shadow-lg p-4">
-              <div className="relative">
-                <div className={`relative border rounded-md bg-background min-h-40 p-3 transition-colors ${
-                  isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
-                }`}>
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {selectedPatients.map(patient => (
-                      <PatientTag
-                        key={patient.id}
-                        patient={patient}
-                        onRemove={handleRemovePatient}
+          {/* Combined search and suggestions container */}
+          <div className="w-[640px]">
+            <div className="bg-popover border border-border rounded-lg shadow-lg overflow-hidden">
+              {/* Search area */}
+              <div className="p-4">
+                <div className="relative">
+                  <div className={`relative border rounded-md bg-background min-h-[88px] p-3 transition-colors ${
+                    isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
+                  }`}>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {selectedPatients.map(patient => (
+                        <PatientTag
+                          key={patient.id}
+                          patient={patient}
+                          onRemove={handleRemovePatient}
+                        />
+                      ))}
+                      {selectedPatients.length > 0 && (
+                        <button
+                          onClick={handleClearAll}
+                          className="inline-flex items-center justify-center w-5 h-5 bg-gray-400 hover:bg-gray-500 rounded-full transition-colors"
+                          aria-label="Clear all patients"
+                        >
+                          <X size={10} className="text-white" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-start">
+                      <Search className="h-4 w-4 text-muted-foreground mr-2 flex-shrink-0 mt-1" />
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        placeholder="Type or paste patient IDs..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onPaste={handlePaste}
+                        onFocus={handleSearchFocus}
+                        onBlur={handleSearchBlur}
+                        className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground"
                       />
-                    ))}
-                    {selectedPatients.length > 0 && (
-                      <button
-                        onClick={handleClearAll}
-                        className="inline-flex items-center justify-center w-5 h-5 bg-gray-400 hover:bg-gray-500 rounded-full transition-colors"
-                        aria-label="Clear all patients"
-                      >
-                        <X size={10} className="text-white" />
-                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-3 mb-4">
+                    <p className="text-xs text-muted-foreground flex-1 pr-4">
+                      Paste, search, or filter up to 15 patients maximum. Press Enter to add individually.
+                    </p>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      {selectedPatients.length} / 15
+                    </span>
+                  </div>
+                </div>
+
+                {selectedPatients.length >= 15 && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-3">
+                    <p className="text-sm text-yellow-800">
+                      You've reached the maximum limit of 15 patients.
+                    </p>
+                  </div>
+                )}
+
+                <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                  Apply
+                </Button>
+              </div>
+
+              {/* Suggestions area - now part of the same container */}
+              {hasInteracted && (
+                <div className="border-t border-border">
+                  <div className="p-2">
+                    <div className="text-xs text-muted-foreground mb-2 px-2">
+                      {suggestions.length > 0 ? `Found ${suggestions.length} matching patients` : 'No matches found'}
+                    </div>
+                    {suggestions.length > 0 && (
+                      <div className="max-h-60 overflow-y-auto">
+                        {suggestions.map((patient, index) => (
+                          <button
+                            key={patient.id}
+                            onClick={() => handleSelectPatient(patient)}
+                            className={`w-full text-left p-3 rounded-md hover:bg-accent transition-colors ${
+                              index === highlightedIndex ? 'bg-accent' : ''
+                            }`}
+                          >
+                            <div className="font-medium text-sm">{patient.id}</div>
+                          </button>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  <div className="flex items-start">
-                    <Search className="h-4 w-4 text-muted-foreground mr-2 flex-shrink-0 mt-1" />
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      placeholder="Type or paste patient IDs..."
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      onPaste={handlePaste}
-                      onFocus={handleSearchFocus}
-                      onBlur={handleSearchBlur}
-                      className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground"
-                    />
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between mt-3 mb-4">
-                  <p className="text-xs text-muted-foreground">
-                    Press Enter to add patient. Up to 15 patients maximum.
-                  </p>
-                  <span className="text-xs text-muted-foreground">
-                    {selectedPatients.length} / 15
-                  </span>
-                </div>
-              </div>
-
-              {selectedPatients.length >= 15 && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-3">
-                  <p className="text-sm text-yellow-800">
-                    You've reached the maximum limit of 15 patients.
-                  </p>
                 </div>
               )}
-
-              <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                Apply
-              </Button>
             </div>
           </div>
-
-          {/* Right side - Suggestions */}
-          {(showSuggestions || searchQuery.trim()) && suggestions.length > 0 && (
-            <div className="w-56">
-              <div
-                ref={suggestionsRef}
-                className="bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto"
-              >
-                <div className="p-2">
-                  <div className="text-xs text-muted-foreground mb-2 px-2">
-                    Found {suggestions.length} matching patients
-                  </div>
-                  {suggestions.map((patient, index) => (
-                    <button
-                      key={patient.id}
-                      onClick={() => handleSelectPatient(patient)}
-                      className={`w-full text-left p-3 rounded-md hover:bg-accent transition-colors ${
-                        index === highlightedIndex ? 'bg-accent' : ''
-                      }`}
-                    >
-                      <div className="font-medium text-sm">{patient.id}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>
