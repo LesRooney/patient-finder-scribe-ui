@@ -1,11 +1,17 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { mockPatients, Patient } from '../data/mockPatients';
 import PatientTag from './PatientTag';
 
-const PatientFilterB: React.FC = () => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+interface PatientFilterBProps {
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+}
+
+const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPatients, setSelectedPatients] = useState<Patient[]>([]);
   const [suggestions, setSuggestions] = useState<Patient[]>([]);
@@ -15,6 +21,7 @@ const PatientFilterB: React.FC = () => {
   const [hasInteracted, setHasInteracted] = useState(false);
   
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Filter suggestions based on search query
   useEffect(() => {
@@ -34,6 +41,20 @@ const PatientFilterB: React.FC = () => {
       setHighlightedIndex(-1);
     }
   }, [searchQuery, selectedPatients]);
+
+  // Handle clicks outside the container
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen, onClose]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -69,17 +90,18 @@ const PatientFilterB: React.FC = () => {
         case 'Escape':
           setShowSuggestions(false);
           setHighlightedIndex(-1);
+          onClose();
           break;
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showSuggestions, suggestions, highlightedIndex, searchQuery, selectedPatients]);
+  }, [showSuggestions, suggestions, highlightedIndex, searchQuery, selectedPatients, onClose]);
 
   const handleFilterToggle = () => {
-    setIsFilterOpen(!isFilterOpen);
-    if (!isFilterOpen) {
+    onToggle();
+    if (!isOpen) {
       setTimeout(() => searchInputRef.current?.focus(), 100);
     } else {
       setSearchQuery('');
@@ -128,7 +150,7 @@ const PatientFilterB: React.FC = () => {
 
   const handleApply = () => {
     console.log('Applied filters with patients B:', selectedPatients.map(p => p.id));
-    setIsFilterOpen(false);
+    onClose();
   };
 
   const handleClearAll = () => {
@@ -160,11 +182,11 @@ const PatientFilterB: React.FC = () => {
         )}
       </Button>
 
-      {isFilterOpen && (
-        <div className="absolute top-12 left-0 z-50">
+      {isOpen && (
+        <div className="absolute top-12 left-0 z-50" ref={containerRef}>
           <div className="bg-popover border border-border rounded-lg shadow-lg overflow-hidden flex">
             {/* Search area */}
-            <div className="p-4">
+            <div className="p-4" style={{ width: '416px' }}>
               <div className="relative">
                 <div className={`relative border rounded-md bg-background transition-colors ${
                   isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
@@ -172,25 +194,7 @@ const PatientFilterB: React.FC = () => {
                   <div className="absolute top-3 left-3">
                     <Search className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <div className="flex flex-wrap gap-1 mb-2 ml-8 mr-3 mt-3">
-                    {selectedPatients.map(patient => (
-                      <PatientTag
-                        key={patient.id}
-                        patient={patient}
-                        onRemove={handleRemovePatient}
-                      />
-                    ))}
-                    {selectedPatients.length > 0 && (
-                      <button
-                        onClick={handleClearAll}
-                        className="inline-flex items-center justify-center w-5 h-5 bg-gray-400 hover:bg-gray-500 rounded-full transition-colors"
-                        aria-label="Clear all patients"
-                      >
-                        <X size={10} className="text-white" />
-                      </button>
-                    )}
-                  </div>
-                  <div className="absolute bottom-3 left-8 right-3">
+                  <div className="absolute top-3 left-8 right-3">
                     <input
                       ref={searchInputRef}
                       type="text"
@@ -202,6 +206,24 @@ const PatientFilterB: React.FC = () => {
                       onBlur={handleSearchBlur}
                       className="w-full bg-transparent outline-none text-base placeholder:text-muted-foreground"
                     />
+                  </div>
+                  {selectedPatients.length > 0 && (
+                    <button
+                      onClick={handleClearAll}
+                      className="absolute top-3 right-3 inline-flex items-center justify-center w-5 h-5 bg-gray-400 hover:bg-gray-500 rounded-full transition-colors"
+                      aria-label="Clear all patients"
+                    >
+                      <X size={10} className="text-white" />
+                    </button>
+                  )}
+                  <div className="flex flex-wrap gap-1 mb-2 ml-8 mr-3 mt-8">
+                    {selectedPatients.map(patient => (
+                      <PatientTag
+                        key={patient.id}
+                        patient={patient}
+                        onRemove={handleRemovePatient}
+                      />
+                    ))}
                   </div>
                 </div>
                 
@@ -223,7 +245,7 @@ const PatientFilterB: React.FC = () => {
                 </div>
               )}
 
-              <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+              <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white" style={{ width: '384px' }}>
                 Apply
               </Button>
             </div>

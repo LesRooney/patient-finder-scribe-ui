@@ -1,11 +1,17 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { mockPatients, Patient } from '../data/mockPatients';
 import PatientTag from './PatientTag';
 
-const PatientFilterA: React.FC = () => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+interface PatientFilterAProps {
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+}
+
+const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPatients, setSelectedPatients] = useState<Patient[]>([]);
   const [suggestions, setSuggestions] = useState<Patient[]>([]);
@@ -15,6 +21,7 @@ const PatientFilterA: React.FC = () => {
   const [hasInteracted, setHasInteracted] = useState(false);
   
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Filter suggestions based on search query
   useEffect(() => {
@@ -34,6 +41,20 @@ const PatientFilterA: React.FC = () => {
       setHighlightedIndex(-1);
     }
   }, [searchQuery, selectedPatients]);
+
+  // Handle clicks outside the container
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen, onClose]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -69,17 +90,18 @@ const PatientFilterA: React.FC = () => {
         case 'Escape':
           setShowSuggestions(false);
           setHighlightedIndex(-1);
+          onClose();
           break;
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showSuggestions, suggestions, highlightedIndex, searchQuery, selectedPatients]);
+  }, [showSuggestions, suggestions, highlightedIndex, searchQuery, selectedPatients, onClose]);
 
   const handleFilterToggle = () => {
-    setIsFilterOpen(!isFilterOpen);
-    if (!isFilterOpen) {
+    onToggle();
+    if (!isOpen) {
       setTimeout(() => searchInputRef.current?.focus(), 100);
     } else {
       setSearchQuery('');
@@ -128,7 +150,7 @@ const PatientFilterA: React.FC = () => {
 
   const handleApply = () => {
     console.log('Applied filters with patients A:', selectedPatients.map(p => p.id));
-    setIsFilterOpen(false);
+    onClose();
   };
 
   const handleClearAll = () => {
@@ -160,15 +182,15 @@ const PatientFilterA: React.FC = () => {
         )}
       </Button>
 
-      {isFilterOpen && (
-        <div className="absolute top-12 left-0 z-50">
+      {isOpen && (
+        <div className="absolute top-12 left-0 z-50" ref={containerRef}>
           <div className="bg-popover border border-border rounded-lg shadow-lg overflow-hidden w-96">
             {/* Search area */}
             <div className="p-4">
               <div className="relative">
-                <div className={`relative border rounded-md bg-background transition-colors ${
+                <div className={`relative border rounded-md bg-background transition-colors mx-2 ${
                   isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
-                }`} style={{ height: '184px', width: '384px' }}>
+                }`} style={{ height: '184px', width: '368px' }}>
                   <div className="absolute top-3 left-3">
                     <Search className="h-4 w-4 text-muted-foreground" />
                   </div>
