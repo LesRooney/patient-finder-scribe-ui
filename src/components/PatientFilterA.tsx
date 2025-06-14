@@ -184,7 +184,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
 
       {isOpen && (
         <div className="absolute top-12 left-0 z-50" ref={containerRef}>
-          <div className="bg-popover border border-border rounded-lg shadow-lg overflow-hidden" style={{ width: '400px' }}>
+          <div className="bg-popover border border-border rounded-lg shadow-lg overflow-hidden" style={{ width: '408px' }}>
             {/* Search area */}
             <div className="p-4">
               <div className="relative">
