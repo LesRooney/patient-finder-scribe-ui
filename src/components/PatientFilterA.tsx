@@ -215,7 +215,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                       <X size={10} className="text-white" />
                     </button>
                   )}
-                  <div className="flex flex-wrap gap-1 mb-2 ml-8 mr-3 mt-8">
+                  <div className="flex flex-wrap gap-1 mb-2 ml-8 mr-3 mt-3">
                     {selectedPatients.map(patient => (
                       <PatientTag
                         key={patient.id}

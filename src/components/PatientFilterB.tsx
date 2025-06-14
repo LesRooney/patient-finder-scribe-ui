@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -216,7 +215,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                       <X size={10} className="text-white" />
                     </button>
                   )}
-                  <div className="flex flex-wrap gap-1 mb-2 ml-8 mr-3 mt-8">
+                  <div className="flex flex-wrap gap-1 mb-2 ml-8 mr-3 mt-3">
                     {selectedPatients.map(patient => (
                       <PatientTag
                         key={patient.id}
