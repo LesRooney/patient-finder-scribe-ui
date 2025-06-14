@@ -197,7 +197,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                     <input
                       ref={searchInputRef}
                       type="text"
-                      placeholder="Type or paste patient IDs..."
+                      placeholder={selectedPatients.length === 0 ? "Type or paste patient IDs..." : ""}
                       value={searchQuery}
                       onChange={handleSearchChange}
                       onPaste={handlePaste}
@@ -257,7 +257,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                     {suggestions.length > 0 ? `Found ${suggestions.length} matching patients` : 'No matches found'}
                   </div>
                   {suggestions.length > 0 && (
-                    <div className="max-h-40 overflow-y-auto">
+                    <div style={{ height: '200px' }} className="overflow-y-auto">
                       {suggestions.map((patient, index) => (
                         <button
                           key={patient.id}

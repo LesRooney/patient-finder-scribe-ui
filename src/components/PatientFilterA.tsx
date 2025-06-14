@@ -266,7 +266,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                     {suggestions.length > 0 ? `Found ${suggestions.length} matching patients` : 'No matches found'}
                   </div>
                   {suggestions.length > 0 && (
-                    <div className="max-h-40 overflow-y-auto">
+                    <div style={{ height: '120px' }} className="overflow-y-auto">
                       {suggestions.slice(0, 5).map((patient, index) => (
                         <button
                           key={patient.id}
