@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -186,9 +185,9 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
         <div className="absolute top-12 left-0 z-50" ref={containerRef}>
           <div className="bg-popover border border-border rounded-lg shadow-lg overflow-hidden" style={{ width: '408px' }}>
             {/* Search area */}
-            <div className="p-4">
+            <div className="p-3">
               <div className="relative">
-                <div className={`relative border rounded-md bg-background transition-colors ${
+                <div className={`relative border rounded-md bg-background transition-colors mx-auto ${
                   isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
                 }`} style={{ height: '184px', width: '384px' }}>
                   <div className="absolute top-3 left-3">
@@ -250,9 +249,11 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
               <div style={{ height: '8px' }}></div>
 
               {/* Apply button in the middle */}
-              <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white" style={{ width: '384px' }}>
-                Apply
-              </Button>
+              <div className="flex justify-center">
+                <Button onClick={handleApply} className="bg-blue-600 hover:bg-blue-700 text-white" style={{ width: '384px' }}>
+                  Apply
+                </Button>
+              </div>
             </div>
 
             <div style={{ height: '8px' }}></div>
