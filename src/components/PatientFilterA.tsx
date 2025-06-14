@@ -185,11 +185,11 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
         <div className="absolute top-12 left-0 z-50" ref={containerRef}>
           <div className="bg-popover border border-border rounded-lg shadow-lg overflow-hidden" style={{ width: '408px' }}>
             {/* Search area */}
-            <div className="p-3">
+            <div className="p-4">
               <div className="relative">
-                <div className={`relative border rounded-md bg-background transition-colors mx-auto ${
+                <div className={`relative border rounded-md bg-background transition-colors ${
                   isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
-                }`} style={{ height: '184px', width: '384px' }}>
+                }`} style={{ height: '184px', width: '376px' }}>
                   <div className="absolute top-3 left-3">
                     <Search className="h-4 w-4 text-muted-foreground" />
                   </div>
@@ -250,7 +250,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
 
               {/* Apply button in the middle */}
               <div className="flex justify-center">
-                <Button onClick={handleApply} className="bg-blue-600 hover:bg-blue-700 text-white" style={{ width: '384px' }}>
+                <Button onClick={handleApply} className="bg-blue-600 hover:bg-blue-700 text-white" style={{ width: '376px' }}>
                   Apply
                 </Button>
               </div>
