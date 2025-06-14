@@ -184,13 +184,13 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
 
       {isOpen && (
         <div className="absolute top-12 left-0 z-50" ref={containerRef}>
-          <div className="bg-popover border border-border rounded-lg shadow-lg overflow-hidden w-96">
+          <div className="bg-popover border border-border rounded-lg shadow-lg overflow-hidden" style={{ width: '400px' }}>
             {/* Search area */}
             <div className="p-4">
               <div className="relative">
-                <div className={`relative border rounded-md bg-background transition-colors mx-2 ${
+                <div className={`relative border rounded-md bg-background transition-colors ${
                   isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
-                }`} style={{ height: '184px', width: '368px' }}>
+                }`} style={{ height: '184px', width: '384px' }}>
                   <div className="absolute top-3 left-3">
                     <Search className="h-4 w-4 text-muted-foreground" />
                   </div>
@@ -198,7 +198,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                     <input
                       ref={searchInputRef}
                       type="text"
-                      placeholder="Type or paste patient IDs..."
+                      placeholder={selectedPatients.length === 0 ? "Type or paste patient IDs..." : ""}
                       value={searchQuery}
                       onChange={handleSearchChange}
                       onPaste={handlePaste}
@@ -207,6 +207,15 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                       className="w-full bg-transparent outline-none text-base placeholder:text-muted-foreground"
                     />
                   </div>
+                  {selectedPatients.length > 0 && (
+                    <button
+                      onClick={handleClearAll}
+                      className="absolute top-3 right-3 inline-flex items-center justify-center w-5 h-5 bg-gray-400 hover:bg-gray-500 rounded-full transition-colors"
+                      aria-label="Clear all patients"
+                    >
+                      <X size={10} className="text-white" />
+                    </button>
+                  )}
                   <div className="flex flex-wrap gap-1 mb-2 ml-8 mr-3 mt-8">
                     {selectedPatients.map(patient => (
                       <PatientTag
@@ -215,15 +224,6 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                         onRemove={handleRemovePatient}
                       />
                     ))}
-                    {selectedPatients.length > 0 && (
-                      <button
-                        onClick={handleClearAll}
-                        className="inline-flex items-center justify-center w-5 h-5 bg-gray-400 hover:bg-gray-500 rounded-full transition-colors"
-                        aria-label="Clear all patients"
-                      >
-                        <X size={10} className="text-white" />
-                      </button>
-                    )}
                   </div>
                 </div>
                 
@@ -250,7 +250,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
               <div style={{ height: '8px' }}></div>
 
               {/* Apply button in the middle */}
-              <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+              <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white" style={{ width: '384px' }}>
                 Apply
               </Button>
             </div>
