@@ -119,9 +119,12 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
     setShowSuggestions(false);
     setHighlightedIndex(-1);
     
-    // Focus the search input after adding a patient to allow continuous adding
+    // Focus the search input and position cursor at the end after adding a patient
     setTimeout(() => {
-      searchInputRef.current?.focus();
+      if (searchInputRef.current) {
+        searchInputRef.current.focus();
+        searchInputRef.current.setSelectionRange(searchInputRef.current.value.length, searchInputRef.current.value.length);
+      }
     }, 0);
   };
 
