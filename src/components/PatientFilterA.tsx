@@ -118,7 +118,11 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
     setSearchQuery('');
     setShowSuggestions(false);
     setHighlightedIndex(-1);
-    searchInputRef.current?.focus();
+    
+    // Focus the search input after adding a patient to allow continuous adding
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 0);
   };
 
   const handleRemovePatient = (patientId: string) => {
