@@ -265,7 +265,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
 
             {/* Suggestions area on the right */}
             {hasInteracted && (
-              <div className="border-l border-border" style={{ width: '320px' }}>
+              <div className="border-l border-border" style={{ width: '240px' }}>
                 <div className="p-4 h-full">
                   <div className="text-xs text-muted-foreground mb-2">
                     {suggestions.length > 0 ? `Found ${suggestions.length} matching patients` : 'No matches found'}
