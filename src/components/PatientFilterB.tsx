@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -233,7 +234,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between mt-3 mb-4">
+                <div className="flex items-start justify-between mt-3 mb-4">
                   <p className="text-xs text-muted-foreground flex-1 pr-4">
                     Paste, search, or filter up to 15 patients maximum. Press Enter to add individually.
                   </p>
