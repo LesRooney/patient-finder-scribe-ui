@@ -198,9 +198,14 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                   isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
                 }`} style={{ height: '184px', width: '376px' }}>
                   
-                  {/* Patient tags section */}
-                  <div className="p-3 pb-0">
-                    <div className="flex flex-wrap gap-1 mb-2">
+                  {/* Search icon - fixed in top left */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                  </div>
+
+                  {/* Patient tags and input section */}
+                  <div className="p-3" style={{ paddingLeft: '36px' }}>
+                    <div className="flex flex-wrap gap-1 items-center min-h-[32px]">
                       {selectedPatients.map(patient => (
                         <PatientTag
                           key={patient.id}
@@ -208,13 +213,6 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                           onRemove={handleRemovePatient}
                         />
                       ))}
-                    </div>
-                  </div>
-
-                  {/* Search input section */}
-                  <div className="px-3 pb-3">
-                    <div className="relative flex items-center">
-                      <Search className="h-4 w-4 text-muted-foreground mr-2" />
                       <input
                         ref={searchInputRef}
                         type="text"
@@ -224,7 +222,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                         onPaste={handlePaste}
                         onFocus={handleSearchFocus}
                         onBlur={handleSearchBlur}
-                        className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground"
+                        className="flex-1 min-w-[120px] bg-transparent outline-none text-base placeholder:text-muted-foreground"
                       />
                     </div>
                   </div>
