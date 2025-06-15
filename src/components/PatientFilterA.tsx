@@ -197,22 +197,38 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                 <div className={`relative border rounded-md bg-background transition-colors ${
                   isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
                 }`} style={{ height: '184px', width: '376px' }}>
-                  <div className="absolute top-3 left-3">
-                    <Search className="h-4 w-4 text-muted-foreground" />
+                  
+                  {/* Patient tags section */}
+                  <div className="p-3 pb-0">
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {selectedPatients.map(patient => (
+                        <PatientTag
+                          key={patient.id}
+                          patient={patient}
+                          onRemove={handleRemovePatient}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <div className="absolute top-3 left-8 right-3">
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      placeholder={selectedPatients.length === 0 ? "Type or paste patient IDs..." : ""}
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      onPaste={handlePaste}
-                      onFocus={handleSearchFocus}
-                      onBlur={handleSearchBlur}
-                      className="w-full bg-transparent outline-none text-base placeholder:text-muted-foreground"
-                    />
+
+                  {/* Search input section */}
+                  <div className="px-3 pb-3">
+                    <div className="relative flex items-center">
+                      <Search className="h-4 w-4 text-muted-foreground mr-2" />
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        placeholder={selectedPatients.length === 0 ? "Type or paste patient IDs..." : ""}
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onPaste={handlePaste}
+                        onFocus={handleSearchFocus}
+                        onBlur={handleSearchBlur}
+                        className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground"
+                      />
+                    </div>
                   </div>
+
                   {selectedPatients.length > 0 && (
                     <button
                       onClick={handleClearAll}
@@ -222,15 +238,6 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                       <X size={10} className="text-white" />
                     </button>
                   )}
-                  <div className="flex flex-wrap gap-1 mb-2 ml-8 mr-3 mt-3">
-                    {selectedPatients.map(patient => (
-                      <PatientTag
-                        key={patient.id}
-                        patient={patient}
-                        onRemove={handleRemovePatient}
-                      />
-                    ))}
-                  </div>
                 </div>
                 
                 <div className="mt-1" style={{ height: '4px' }}></div>
