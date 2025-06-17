@@ -1,5 +1,6 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { mockPatients, Patient } from '../data/mockPatients';
 import PatientTag from './PatientTag';
@@ -178,9 +179,18 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
     <div className="relative">
       <Button
         onClick={handleFilterToggle}
-        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+        className={`flex items-center gap-2 text-gray-700 border-2 rounded-2xl transition-all duration-200 ${
+          isOpen 
+            ? 'bg-[#EEF1F4] border-blue-500' 
+            : 'bg-[#EEF1F4] border-transparent hover:bg-[#DDE0E5]'
+        }`}
+        variant="ghost"
       >
         Patient ID B
+        <ChevronDown 
+          size={16} 
+          className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
+        />
         {selectedPatients.length > 0 && (
           <span className="ml-2 bg-white text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium">
             {selectedPatients.length}
