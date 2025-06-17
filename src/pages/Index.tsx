@@ -2,6 +2,7 @@
 import React from 'react';
 import PatientFilter from '../components/PatientFilter';
 import { mockPatients } from '../data/mockPatients';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const Index = () => {
   // Get first 30 patients for the example
@@ -10,6 +11,14 @@ const Index = () => {
 
   const handleCopyPatientIds = () => {
     navigator.clipboard.writeText(patientIdList);
+  };
+
+  const handleCopyPatientId = (patientId: string) => {
+    navigator.clipboard.writeText(patientId);
+  };
+
+  const handleCopyPatientName = (patientName: string) => {
+    navigator.clipboard.writeText(patientName);
   };
 
   return (
@@ -61,21 +70,37 @@ const Index = () => {
               </button>
             </div>
             <p className="text-muted-foreground text-sm mb-4">
-              Copy these patient IDs and paste them into the filter above to test the functionality.
+              Click on individual patient IDs or names to copy them, or drag to select multiple entries.
             </p>
-            <div className="bg-gray-50 rounded-md p-4 max-h-64 overflow-y-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm font-mono">
-                {examplePatients.map(patient => (
-                  <div
-                    key={patient.id}
-                    className="p-2 bg-white rounded border hover:bg-gray-100 cursor-pointer transition-colors"
-                    onClick={() => navigator.clipboard.writeText(patient.id)}
-                    title="Click to copy this ID"
-                  >
-                    {patient.id}
-                  </div>
-                ))}
-              </div>
+            <div className="border rounded-md overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-1/3">Patient ID</TableHead>
+                    <TableHead className="w-2/3">Patient Name</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {examplePatients.map(patient => (
+                    <TableRow key={patient.id} className="hover:bg-gray-50">
+                      <TableCell 
+                        className="font-mono text-sm cursor-pointer select-text hover:bg-blue-50 transition-colors"
+                        onClick={() => handleCopyPatientId(patient.id)}
+                        title="Click to copy patient ID"
+                      >
+                        {patient.id}
+                      </TableCell>
+                      <TableCell 
+                        className="text-sm cursor-pointer select-text hover:bg-blue-50 transition-colors"
+                        onClick={() => handleCopyPatientName(patient.name)}
+                        title="Click to copy patient name"
+                      >
+                        {patient.name}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           </div>
         </div>

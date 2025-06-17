@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,6 +21,15 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
   
   const searchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Calculate dynamic height based on content
+  const calculateSearchAreaHeight = () => {
+    const baseHeight = 60; // Base height for padding and input
+    const tagHeight = 28; // Height per tag row
+    const tagsPerRow = Math.floor(340 / 90); // Approximate tags per row
+    const numRows = Math.ceil(selectedPatients.length / tagsPerRow);
+    return Math.max(baseHeight + (numRows * tagHeight), 60);
+  };
 
   // Filter suggestions based on search query
   useEffect(() => {
@@ -111,7 +119,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
   };
 
   const handleSelectPatient = (patient: Patient) => {
-    if (selectedPatients.length >= 15) {
+    if (selectedPatients.length >= 20) {
       return;
     }
     
@@ -146,7 +154,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
     
     pastedIds.forEach(id => {
       const patient = mockPatients.find(p => p.id === id.trim());
-      if (patient && !selectedPatients.some(selected => selected.id === patient.id) && selectedPatients.length < 15) {
+      if (patient && !selectedPatients.some(selected => selected.id === patient.id) && selectedPatients.length < 20) {
         setSelectedPatients(prev => [...prev, patient]);
       }
     });
@@ -174,6 +182,9 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
   const handleSearchBlur = () => {
     setIsSearchFocused(false);
   };
+
+  const dynamicHeight = calculateSearchAreaHeight();
+  const isOverLimit = selectedPatients.length > 15;
 
   return (
     <div className="relative">
@@ -206,7 +217,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
               <div className="relative">
                 <div className={`relative border rounded-md bg-background transition-colors ${
                   isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
-                }`} style={{ height: '184px', width: '384px' }}>
+                }`} style={{ height: `${dynamicHeight}px`, width: '384px' }}>
                   
                   {/* Search icon - fixed in top left */}
                   <div className="absolute top-3 left-3 z-10">
@@ -253,7 +264,13 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                     Paste, search, or filter up to 15 patients maximum. Press Enter to add individually.
                   </p>
                   <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {selectedPatients.length} / 15
+                    {isOverLimit ? (
+                      <>
+                        <span className="text-red-500 font-medium">{selectedPatients.length}</span> / 15
+                      </>
+                    ) : (
+                      `${selectedPatients.length} / 15`
+                    )}
                   </span>
                 </div>
               </div>
@@ -261,7 +278,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
               {selectedPatients.length >= 15 && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-3">
                   <p className="text-sm text-yellow-800">
-                    You've reached the maximum limit of 15 patients.
+                    You've reached the maximum limit of 15 patients. Please adjust your search.
                   </p>
                 </div>
               )}

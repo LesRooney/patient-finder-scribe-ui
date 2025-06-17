@@ -1,9 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { mockPatients, Patient } from '../data/mockPatients';
 import PatientTag from './PatientTag';
+import { useToast } from '@/hooks/use-toast';
 
 interface PatientFilterAProps {
   isOpen: boolean;
@@ -22,6 +22,16 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
   
   const searchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+
+  // Calculate dynamic height based on content
+  const calculateSearchAreaHeight = () => {
+    const baseHeight = 60; // Base height for padding and input
+    const tagHeight = 28; // Height per tag row
+    const tagsPerRow = Math.floor(340 / 90); // Approximate tags per row
+    const numRows = Math.ceil(selectedPatients.length / tagsPerRow);
+    return Math.max(baseHeight + (numRows * tagHeight), 60);
+  };
 
   // Filter suggestions based on search query
   useEffect(() => {
@@ -112,6 +122,11 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
 
   const handleSelectPatient = (patient: Patient) => {
     if (selectedPatients.length >= 15) {
+      toast({
+        title: "Patient limit exceeded",
+        description: "You've exceeded the amount of patients allowed. We've accepted the first 15 patients.",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -144,12 +159,22 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
     const pastedText = e.clipboardData.getData('text');
     const pastedIds = pastedText.split(/[\s,;]+/).filter(id => id.trim());
     
+    let addedCount = 0;
     pastedIds.forEach(id => {
       const patient = mockPatients.find(p => p.id === id.trim());
-      if (patient && !selectedPatients.some(selected => selected.id === patient.id) && selectedPatients.length < 15) {
+      if (patient && !selectedPatients.some(selected => selected.id === patient.id) && selectedPatients.length + addedCount < 15) {
         setSelectedPatients(prev => [...prev, patient]);
+        addedCount++;
       }
     });
+
+    if (pastedIds.length > 15 || selectedPatients.length + pastedIds.length > 15) {
+      toast({
+        title: "Patient limit exceeded",
+        description: "You've exceeded the amount of patients allowed. We've accepted the first 15 patients.",
+        variant: "destructive",
+      });
+    }
     
     setSearchQuery('');
     e.preventDefault();
@@ -174,6 +199,8 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
   const handleSearchBlur = () => {
     setIsSearchFocused(false);
   };
+
+  const dynamicHeight = calculateSearchAreaHeight();
 
   return (
     <div className="relative">
@@ -206,7 +233,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
               <div className="relative">
                 <div className={`relative border rounded-md bg-background transition-colors ${
                   isSearchFocused ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-20' : 'border-input'
-                }`} style={{ height: '184px', width: '376px' }}>
+                }`} style={{ height: `${dynamicHeight}px`, width: '376px' }}>
                   
                   {/* Search icon - fixed in top left */}
                   <div className="absolute top-3 left-3 z-10">
