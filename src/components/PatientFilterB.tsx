@@ -283,7 +283,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                 </div>
               )}
 
-              <Button onClick={handleApply} className="w-full bg-blue-600 hover:bg-blue-700 text-white" style={{ width: '384px' }}>
+              <Button onClick={handleApply} className="w-full bg-[#0070C0] hover:bg-[#005FAB] text-white" style={{ width: '384px' }}>
                 Apply
               </Button>
             </div>
