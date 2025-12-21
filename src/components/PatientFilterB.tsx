@@ -22,14 +22,8 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
   const searchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Calculate dynamic height based on content
-  const calculateSearchAreaHeight = () => {
-    const baseHeight = 60; // Base height for padding and input
-    const tagHeight = 28; // Height per tag row
-    const tagsPerRow = Math.floor(340 / 90); // Approximate tags per row
-    const numRows = Math.ceil(selectedPatients.length / tagsPerRow);
-    return Math.max(baseHeight + (numRows * tagHeight), 60);
-  };
+  // Fixed height for search area
+  const searchAreaHeight = 114;
 
   // Filter suggestions based on search query
   useEffect(() => {
@@ -183,7 +177,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
     setIsSearchFocused(false);
   };
 
-  const dynamicHeight = calculateSearchAreaHeight();
+  const dynamicHeight = searchAreaHeight;
   const isOverLimit = selectedPatients.length > 15;
 
   return (
@@ -225,8 +219,8 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                   </div>
 
                   {/* Patient tags and input section */}
-                  <div className="p-3" style={{ paddingLeft: '36px' }}>
-                    <div className="flex flex-wrap gap-1 items-center min-h-[32px]">
+                  <div className="p-3 h-full overflow-y-auto" style={{ paddingLeft: '36px', paddingRight: '36px' }}>
+                    <div className="flex flex-wrap gap-1 items-start content-start min-h-full">
                       {selectedPatients.map(patient => (
                         <PatientTag
                           key={patient.id}
@@ -251,7 +245,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                   {selectedPatients.length > 0 && (
                     <button
                       onClick={handleClearAll}
-                      className="absolute top-3 right-3 inline-flex items-center justify-center w-5 h-5 bg-gray-400 hover:bg-gray-500 rounded-full transition-colors"
+                      className="absolute top-3 right-3 inline-flex items-center justify-center w-5 h-5 bg-gray-400 hover:bg-gray-500 rounded-full transition-colors z-10"
                       aria-label="Clear all patients"
                     >
                       <X size={10} className="text-white" />
