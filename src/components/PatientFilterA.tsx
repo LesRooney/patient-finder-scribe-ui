@@ -208,8 +208,8 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
         onClick={handleFilterToggle}
         className={`flex items-center gap-2 text-white border-2 rounded-2xl transition-all duration-200 ${
           isOpen 
-            ? 'bg-primary border-blue-500' 
-            : 'bg-primary border-transparent hover:bg-primary/90'
+            ? 'bg-[#0070C0] border-blue-500' 
+            : 'bg-[#0070C0] border-transparent hover:bg-[#005FAB] hover:text-white'
         }`}
         variant="ghost"
       >
