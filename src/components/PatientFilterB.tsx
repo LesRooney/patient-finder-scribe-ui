@@ -260,7 +260,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                 </div>
                 
                 <div className="flex items-start justify-between mt-3 mb-4">
-                  <p className="text-xs text-muted-foreground flex-1 pr-4">
+                  <p className="text-xs text-muted-foreground flex-1 pr-4 text-left">
                     Paste, search, or filter up to 15 patients maximum. Press Enter to add individually.
                   </p>
                   <span className="text-xs text-muted-foreground whitespace-nowrap">
