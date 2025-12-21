@@ -299,7 +299,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
 
               {/* Apply button in the middle */}
               <div className="flex justify-center">
-                <Button onClick={handleApply} className="bg-blue-600 hover:bg-blue-700 text-white" style={{ width: '376px' }}>
+                <Button onClick={handleApply} className="bg-[#0070C0] hover:bg-[#005FAB] text-white" style={{ width: '376px' }}>
                   Apply
                 </Button>
               </div>
