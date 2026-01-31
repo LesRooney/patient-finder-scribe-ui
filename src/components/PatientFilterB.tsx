@@ -165,10 +165,16 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
     const pastedText = e.clipboardData.getData('text');
     const pastedIds = pastedText.split(/[\s,;]+/).filter(id => id.trim());
     
+    // Allow adding all valid patients, even if over limit
     pastedIds.forEach(id => {
       const patient = mockPatients.find(p => p.id === id.trim());
-      if (patient && !selectedPatients.some(selected => selected.id === patient.id) && selectedPatients.length < 20) {
-        setSelectedPatients(prev => [...prev, patient]);
+      if (patient && !selectedPatients.some(selected => selected.id === patient.id)) {
+        setSelectedPatients(prev => {
+          if (!prev.some(p => p.id === patient.id)) {
+            return [...prev, patient];
+          }
+          return prev;
+        });
       }
     });
     
@@ -276,14 +282,11 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                   <p className="text-xs text-muted-foreground flex-1 pr-4 text-left">
                     Paste, search, or filter up to 15 patients maximum. Press Enter to add individually.
                   </p>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {isOverLimit ? (
-                      <>
-                        <span className="text-red-500 font-medium">{selectedPatients.length}</span> / 15
-                      </>
-                    ) : (
-                      `${selectedPatients.length} / 15`
-                    )}
+                  <span className={`text-xs whitespace-nowrap ${selectedPatients.length > 15 ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
+                    {selectedPatients.length > 15 
+                      ? `-${selectedPatients.length - 15} / 15`
+                      : `${selectedPatients.length} / 15`
+                    }
                   </span>
                 </div>
               </div>
