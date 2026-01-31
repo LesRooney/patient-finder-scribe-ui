@@ -24,10 +24,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
+        <div className="text-left mb-8">
           <h1 className="text-4xl font-bold mb-4 text-foreground">Patient Filter Example</h1>
           <p className="text-xl text-muted-foreground">
-            Filter and search through patient records with our advanced patient ID filter
+            Filter and search prototype for Q3 release
           </p>
         </div>
 
@@ -48,7 +48,7 @@ const Index = () => {
               </button>
             </div>
             <p className="text-muted-foreground text-sm mb-4 text-left" style={{ marginTop: '8px' }}>
-              Click on individual patient IDs to copy them, or drag to select multiple entries.
+              Click on individual patient IDs to copy them, or drag to select multiple entries to test this prototype.
             </p>
             <div className="border rounded-md overflow-hidden">
               <Table>
