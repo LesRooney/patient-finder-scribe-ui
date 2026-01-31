@@ -136,7 +136,26 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    const value = e.target.value;
+    
+    // Check if the last character is a space or comma (delimiter)
+    if (value.endsWith(' ') || value.endsWith(',')) {
+      const trimmedValue = value.slice(0, -1).trim();
+      if (trimmedValue) {
+        // Try to find a matching patient
+        const patient = mockPatients.find(p => 
+          !selectedPatients.some(selected => selected.id === p.id) &&
+          (p.id.toLowerCase() === trimmedValue.toLowerCase() ||
+           p.name.toLowerCase() === trimmedValue.toLowerCase())
+        );
+        if (patient && selectedPatients.length < 20) {
+          handleSelectPatient(patient);
+          return;
+        }
+      }
+    }
+    
+    setSearchQuery(value);
     if (!hasInteracted) {
       setHasInteracted(true);
     }
