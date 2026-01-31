@@ -60,8 +60,8 @@ const Index = () => {
 
         <div className="mt-8">
           <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Patient List Example</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold">Example of patient IDs</h3>
               <button
                 onClick={handleCopyPatientIds}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition-colors"
@@ -69,7 +69,7 @@ const Index = () => {
                 Copy All IDs
               </button>
             </div>
-            <p className="text-muted-foreground text-sm mb-4 text-left">
+            <p className="text-muted-foreground text-sm mb-4 text-left" style={{ marginTop: '8px' }}>
               Click on individual patient IDs to copy them, or drag to select multiple entries.
             </p>
             <div className="border rounded-md overflow-hidden">
