@@ -172,22 +172,18 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
     const pastedText = e.clipboardData.getData('text');
     const pastedIds = pastedText.split(/[\s,;]+/).filter(id => id.trim());
     
-    let addedCount = 0;
+    // Allow adding all valid patients, even if over limit
     pastedIds.forEach(id => {
       const patient = mockPatients.find(p => p.id === id.trim());
-      if (patient && !selectedPatients.some(selected => selected.id === patient.id) && selectedPatients.length + addedCount < 15) {
-        setSelectedPatients(prev => [...prev, patient]);
-        addedCount++;
+      if (patient && !selectedPatients.some(selected => selected.id === patient.id)) {
+        setSelectedPatients(prev => {
+          if (!prev.some(p => p.id === patient.id)) {
+            return [...prev, patient];
+          }
+          return prev;
+        });
       }
     });
-
-    if (pastedIds.length > 15 || selectedPatients.length + pastedIds.length > 15) {
-      toast({
-        title: "Patient limit exceeded",
-        description: "You've exceeded the amount of patients allowed. We've accepted the first 15 patients.",
-        variant: "destructive",
-      });
-    }
     
     setSearchQuery('');
     e.preventDefault();
@@ -304,8 +300,11 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                   <p className="text-xs text-muted-foreground flex-1 pr-4 leading-relaxed text-left">
                     Paste, search, or filter up to 15 patients maximum. Press Enter to add individually.
                   </p>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {selectedPatients.length} / 15
+                  <span className={`text-xs whitespace-nowrap ${selectedPatients.length > 15 ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
+                    {selectedPatients.length > 15 
+                      ? `-${selectedPatients.length - 15} / 15`
+                      : `${selectedPatients.length} / 15`
+                    }
                   </span>
                 </div>
               </div>
