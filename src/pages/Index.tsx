@@ -69,33 +69,25 @@ const Index = () => {
                 Copy All IDs
               </button>
             </div>
-            <p className="text-muted-foreground text-sm mb-4">
-              Click on individual patient IDs or names to copy them, or drag to select multiple entries.
+            <p className="text-muted-foreground text-sm mb-4 text-left">
+              Click on individual patient IDs to copy them, or drag to select multiple entries.
             </p>
             <div className="border rounded-md overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-1/3">Patient ID</TableHead>
-                    <TableHead className="w-2/3">Patient Name</TableHead>
+                    <TableHead className="text-left">Patient ID</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {examplePatients.map(patient => (
                     <TableRow key={patient.id} className="hover:bg-gray-50">
                       <TableCell 
-                        className="font-mono text-sm cursor-pointer select-text hover:bg-blue-50 transition-colors"
+                        className="font-mono text-sm cursor-pointer select-text hover:bg-blue-50 transition-colors text-left"
                         onClick={() => handleCopyPatientId(patient.id)}
                         title="Click to copy patient ID"
                       >
                         {patient.id}
-                      </TableCell>
-                      <TableCell 
-                        className="text-sm cursor-pointer select-text hover:bg-blue-50 transition-colors"
-                        onClick={() => handleCopyPatientName(patient.name)}
-                        title="Click to copy patient name"
-                      >
-                        {patient.name}
                       </TableCell>
                     </TableRow>
                   ))}
