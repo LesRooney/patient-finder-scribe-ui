@@ -25,7 +25,7 @@ const Index = () => {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-left mb-8">
-          <h1 className="text-4xl font-bold mb-4 text-foreground">Patient Filter Example</h1>
+          <h1 className="text-4xl font-bold mb-4 text-foreground">Patient Filter Component Example</h1>
           <p className="text-xl text-muted-foreground">
             Filter and search prototype for Q3 release
           </p>
@@ -42,7 +42,7 @@ const Index = () => {
               <h3 className="text-lg font-semibold">Example of patient IDs</h3>
               <button
                 onClick={handleCopyPatientIds}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition-colors"
+                className="px-4 py-2 bg-[#EEF1F4] hover:bg-[#DDE0E5] text-[#1A1C1E] text-sm rounded-md transition-colors border border-[#EEF1F4]"
               >
                 Copy All IDs
               </button>
