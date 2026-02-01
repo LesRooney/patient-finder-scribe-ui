@@ -4,64 +4,25 @@ import PatientFilter from '../components/PatientFilter';
 import { mockPatients } from '../data/mockPatients';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-// Country data with 3-letter codes and flag emojis
-const countries = [
-  { code: 'USA', flag: '🇺🇸' },
-  { code: 'GBR', flag: '🇬🇧' },
-  { code: 'FRA', flag: '🇫🇷' },
-  { code: 'DEU', flag: '🇩🇪' },
-  { code: 'CAN', flag: '🇨🇦' },
-  { code: 'AUS', flag: '🇦🇺' },
-  { code: 'JPN', flag: '🇯🇵' },
-  { code: 'BRA', flag: '🇧🇷' },
-  { code: 'ITA', flag: '🇮🇹' },
-  { code: 'ESP', flag: '🇪🇸' },
-];
-
-// Generate varied length patient IDs
-const generateVariedId = (originalId: string, index: number): string => {
-  const lengths = [6, 7, 8, 10, 11, 15];
-  const targetLength = lengths[index % lengths.length];
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  
-  if (originalId.length >= targetLength) {
-    return originalId.slice(0, targetLength);
-  }
-  
-  let result = originalId;
-  while (result.length < targetLength) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result.slice(0, targetLength);
-};
-
-// Assign countries ensuring USA, GBR, FRA appear early
-const assignCountry = (index: number) => {
-  if (index === 0) return countries[0]; // USA
-  if (index === 1) return countries[1]; // GBR
-  if (index === 2) return countries[2]; // FRA
-  return countries[index % countries.length];
-};
-
 const Index = () => {
-  // Get first 30 patients for the example with varied IDs and countries
-  const examplePatients = mockPatients.slice(0, 30).map((patient, index) => ({
-    ...patient,
-    id: generateVariedId(patient.id, index),
-    country: assignCountry(index),
-  }));
+  // Use the first 30 patients from the database
+  const examplePatients = mockPatients.slice(0, 30);
   const patientIdList = examplePatients.map(patient => patient.id).join('\n');
 
-  const handleCopyPatientIds = () => {
-    navigator.clipboard.writeText(patientIdList);
+  const handleCopyPatientIds = async () => {
+    try {
+      await navigator.clipboard.writeText(patientIdList);
+    } catch (err) {
+      console.error('Failed to copy patient IDs:', err);
+    }
   };
 
-  const handleCopyPatientId = (patientId: string) => {
-    navigator.clipboard.writeText(patientId);
-  };
-
-  const handleCopyPatientName = (patientName: string) => {
-    navigator.clipboard.writeText(patientName);
+  const handleCopyPatientId = async (patientId: string) => {
+    try {
+      await navigator.clipboard.writeText(patientId);
+    } catch (err) {
+      console.error('Failed to copy patient ID:', err);
+    }
   };
 
   return (
