@@ -215,10 +215,10 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
     <div className="relative">
       <Button
         onClick={handleFilterToggle}
-        className={`flex items-center gap-2 text-white border-2 rounded-2xl transition-all duration-200 ${
+        className={`flex items-center gap-2 text-[#1A1C1E] border-2 rounded-2xl transition-all duration-200 ${
           isOpen 
-            ? 'bg-[#0070C0] border-blue-500' 
-            : 'bg-[#0070C0] border-transparent hover:bg-[#005FAB] hover:text-white'
+            ? 'bg-[#EEF1F4] border-[#EEF1F4]' 
+            : 'bg-[#EEF1F4] border-[#EEF1F4] hover:bg-[#DDE0E5] hover:border-[#DDE0E5]'
         }`}
         variant="ghost"
       >
@@ -228,7 +228,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
           className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
         />
         {selectedPatients.length > 0 && (
-          <span className="ml-2 bg-white text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium">
+          <span className="ml-2 bg-white text-[#1A1C1E] px-2 py-0.5 rounded-full text-xs font-medium">
             {selectedPatients.length}
           </span>
         )}
@@ -245,7 +245,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                 }`} style={{ height: `${dynamicHeight}px`, width: '376px' }}>
                   
                   {/* Search icon - fixed in top left */}
-                  <div className="absolute top-3 left-3 z-10">
+                  <div className="absolute left-3 z-10" style={{ top: '14px' }}>
                     <Search className="h-4 w-4 text-muted-foreground" />
                   </div>
 
