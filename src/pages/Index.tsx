@@ -4,9 +4,52 @@ import PatientFilter from '../components/PatientFilter';
 import { mockPatients } from '../data/mockPatients';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
+// Country data with 3-letter codes and flag emojis
+const countries = [
+  { code: 'USA', flag: '🇺🇸' },
+  { code: 'GBR', flag: '🇬🇧' },
+  { code: 'FRA', flag: '🇫🇷' },
+  { code: 'DEU', flag: '🇩🇪' },
+  { code: 'CAN', flag: '🇨🇦' },
+  { code: 'AUS', flag: '🇦🇺' },
+  { code: 'JPN', flag: '🇯🇵' },
+  { code: 'BRA', flag: '🇧🇷' },
+  { code: 'ITA', flag: '🇮🇹' },
+  { code: 'ESP', flag: '🇪🇸' },
+];
+
+// Generate varied length patient IDs
+const generateVariedId = (originalId: string, index: number): string => {
+  const lengths = [6, 7, 8, 10, 11, 15];
+  const targetLength = lengths[index % lengths.length];
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  
+  if (originalId.length >= targetLength) {
+    return originalId.slice(0, targetLength);
+  }
+  
+  let result = originalId;
+  while (result.length < targetLength) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result.slice(0, targetLength);
+};
+
+// Assign countries ensuring USA, GBR, FRA appear early
+const assignCountry = (index: number) => {
+  if (index === 0) return countries[0]; // USA
+  if (index === 1) return countries[1]; // GBR
+  if (index === 2) return countries[2]; // FRA
+  return countries[index % countries.length];
+};
+
 const Index = () => {
-  // Get first 30 patients for the example
-  const examplePatients = mockPatients.slice(0, 30);
+  // Get first 30 patients for the example with varied IDs and countries
+  const examplePatients = mockPatients.slice(0, 30).map((patient, index) => ({
+    ...patient,
+    id: generateVariedId(patient.id, index),
+    country: assignCountry(index),
+  }));
   const patientIdList = examplePatients.map(patient => patient.id).join('\n');
 
   const handleCopyPatientIds = () => {
@@ -55,6 +98,7 @@ const Index = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-left">Patient ID</TableHead>
+                    <TableHead className="text-right">Country</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -66,6 +110,12 @@ const Index = () => {
                         title="Click to copy patient ID"
                       >
                         {patient.id}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-sm text-muted-foreground">{patient.country.code}</span>
+                          <span style={{ fontSize: '20px', lineHeight: '24px' }}>{patient.country.flag}</span>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
