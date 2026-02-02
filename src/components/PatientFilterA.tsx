@@ -5,6 +5,10 @@ import { mockPatients, Patient } from '../data/mockPatients';
 import PatientTag from './PatientTag';
 import { useToast } from '@/hooks/use-toast';
 
+interface SelectedPatient extends Patient {
+  isInvalid?: boolean;
+}
+
 interface PatientFilterAProps {
   isOpen: boolean;
   onToggle: () => void;
@@ -13,7 +17,7 @@ interface PatientFilterAProps {
 
 const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPatients, setSelectedPatients] = useState<Patient[]>([]);
+  const [selectedPatients, setSelectedPatients] = useState<SelectedPatient[]>([]);
   const [suggestions, setSuggestions] = useState<Patient[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -26,6 +30,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
 
   // Fixed height for search area
   const searchAreaHeight = 114;
+  const maxPatients = 15;
 
   // Filter suggestions based on search query
   useEffect(() => {
@@ -81,14 +86,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
           if (highlightedIndex >= 0 && suggestions[highlightedIndex]) {
             handleSelectPatient(suggestions[highlightedIndex]);
           } else if (searchQuery.trim()) {
-            const exactMatch = mockPatients.find(patient => 
-              !selectedPatients.some(selected => selected.id === patient.id) &&
-              (patient.id.toLowerCase() === searchQuery.toLowerCase() ||
-               patient.name.toLowerCase() === searchQuery.toLowerCase())
-            );
-            if (exactMatch) {
-              handleSelectPatient(exactMatch);
-            }
+            handleAddPatientById(searchQuery.trim());
           }
           break;
         case 'Escape':
@@ -114,8 +112,40 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
     }
   };
 
+  const handleAddPatientById = (id: string) => {
+    if (selectedPatients.some(p => p.id === id)) {
+      setSearchQuery('');
+      return;
+    }
+
+    const existingPatient = mockPatients.find(p => p.id.toLowerCase() === id.toLowerCase());
+    
+    if (existingPatient) {
+      handleSelectPatient(existingPatient);
+    } else {
+      // Add as invalid patient (not in database)
+      const invalidPatient: SelectedPatient = {
+        id: id,
+        name: 'Unknown',
+        dateOfBirth: '',
+        status: 'inactive',
+        country: { code: 'UNK', flag: '❓', prefix: '' },
+        isInvalid: true,
+      };
+      setSelectedPatients(prev => [...prev, invalidPatient]);
+      setSearchQuery('');
+      setShowSuggestions(false);
+      
+      setTimeout(() => {
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      }, 0);
+    }
+  };
+
   const handleSelectPatient = (patient: Patient) => {
-    if (selectedPatients.length >= 15) {
+    if (selectedPatients.length >= maxPatients) {
       toast({
         title: "Patient limit exceeded",
         description: "You've exceeded the amount of patients allowed. We've accepted the first 15 patients.",
@@ -124,12 +154,11 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
       return;
     }
     
-    setSelectedPatients(prev => [...prev, patient]);
+    setSelectedPatients(prev => [...prev, { ...patient, isInvalid: false }]);
     setSearchQuery('');
     setShowSuggestions(false);
     setHighlightedIndex(-1);
     
-    // Focus the search input and position cursor at the end after adding a patient
     setTimeout(() => {
       if (searchInputRef.current) {
         searchInputRef.current.focus();
@@ -149,16 +178,8 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
     if (value.endsWith(' ') || value.endsWith(',')) {
       const trimmedValue = value.slice(0, -1).trim();
       if (trimmedValue) {
-        // Try to find a matching patient
-        const patient = mockPatients.find(p => 
-          !selectedPatients.some(selected => selected.id === p.id) &&
-          (p.id.toLowerCase() === trimmedValue.toLowerCase() ||
-           p.name.toLowerCase() === trimmedValue.toLowerCase())
-        );
-        if (patient && selectedPatients.length < 15) {
-          handleSelectPatient(patient);
-          return;
-        }
+        handleAddPatientById(trimmedValue);
+        return;
       }
     }
     
@@ -172,16 +193,34 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
     const pastedText = e.clipboardData.getData('text');
     const pastedIds = pastedText.split(/[\s,;]+/).filter(id => id.trim());
     
-    // Allow adding all valid patients, even if over limit
     pastedIds.forEach(id => {
-      const patient = mockPatients.find(p => p.id === id.trim());
-      if (patient && !selectedPatients.some(selected => selected.id === patient.id)) {
-        setSelectedPatients(prev => {
-          if (!prev.some(p => p.id === patient.id)) {
-            return [...prev, patient];
-          }
-          return prev;
-        });
+      const trimmedId = id.trim();
+      if (!selectedPatients.some(p => p.id === trimmedId)) {
+        const patient = mockPatients.find(p => p.id === trimmedId);
+        if (patient) {
+          setSelectedPatients(prev => {
+            if (!prev.some(p => p.id === patient.id)) {
+              return [...prev, { ...patient, isInvalid: false }];
+            }
+            return prev;
+          });
+        } else {
+          // Add as invalid
+          const invalidPatient: SelectedPatient = {
+            id: trimmedId,
+            name: 'Unknown',
+            dateOfBirth: '',
+            status: 'inactive',
+            country: { code: 'UNK', flag: '❓', prefix: '' },
+            isInvalid: true,
+          };
+          setSelectedPatients(prev => {
+            if (!prev.some(p => p.id === trimmedId)) {
+              return [...prev, invalidPatient];
+            }
+            return prev;
+          });
+        }
       }
     });
     
@@ -210,6 +249,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
   };
 
   const dynamicHeight = searchAreaHeight;
+  const overLimit = selectedPatients.length - maxPatients;
 
   return (
     <div className="relative">
@@ -257,6 +297,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                           key={patient.id}
                           patient={patient}
                           onRemove={handleRemovePatient}
+                          isInvalid={patient.isInvalid}
                         />
                       ))}
                       <input
@@ -282,16 +323,6 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                       <X size={10} className="text-white" />
                     </button>
                   )}
-
-                  {selectedPatients.length > 0 && (
-                    <button
-                      onClick={handleClearAll}
-                      className="absolute top-3 right-3 inline-flex items-center justify-center w-5 h-5 bg-gray-400 hover:bg-gray-500 rounded-full transition-colors"
-                      aria-label="Clear all patients"
-                    >
-                      <X size={10} className="text-white" />
-                    </button>
-                  )}
                 </div>
                 
                 <div className="mt-1" style={{ height: '4px' }}></div>
@@ -300,13 +331,20 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                   <p className="text-xs text-muted-foreground flex-1 pr-4 leading-relaxed text-left">
                     Paste, search, or filter up to 15 patients maximum. Press Enter to add individually.
                   </p>
-                  <span className="text-xs whitespace-nowrap text-muted-foreground">
-                    {selectedPatients.length} / 15
+                  <span className="text-xs whitespace-nowrap">
+                    {overLimit > 0 ? (
+                      <>
+                        <span className="text-muted-foreground">{selectedPatients.length} / 15 </span>
+                        <span className="text-[#BF0018] font-medium">-{overLimit}</span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">{selectedPatients.length} / 15</span>
+                    )}
                   </span>
                 </div>
               </div>
 
-              {selectedPatients.length >= 15 && (
+              {selectedPatients.length >= maxPatients && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mt-3">
                   <p className="text-sm text-yellow-800 text-left">
                     You have reached the maximum limit of 15 patients.

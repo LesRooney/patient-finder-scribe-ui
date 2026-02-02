@@ -6,18 +6,25 @@ import { Patient } from '../data/mockPatients';
 interface PatientTagProps {
   patient: Patient;
   onRemove: (patientId: string) => void;
+  isInvalid?: boolean;
 }
 
-const PatientTag: React.FC<PatientTagProps> = ({ patient, onRemove }) => {
+const PatientTag: React.FC<PatientTagProps> = ({ patient, onRemove, isInvalid = false }) => {
   return (
     <div 
-      className="inline-flex items-center gap-1 px-2 rounded text-sm transition-colors bg-[#EEF1F4] hover:bg-[#DDE0E5] text-foreground"
+      className={`inline-flex items-center gap-1 px-2 text-sm transition-colors ${
+        isInvalid 
+          ? 'bg-[#FFECEE] text-[#BF0018] hover:bg-[#FFD9DD]' 
+          : 'bg-[#EEF1F4] hover:bg-[#DDE0E5] text-foreground'
+      }`}
       style={{ height: '24px', borderRadius: '4px' }}
     >
       <span className="font-medium">{patient.id}</span>
       <button
         onClick={() => onRemove(patient.id)}
-        className="p-0.5 hover:bg-gray-300 rounded transition-colors"
+        className={`p-0.5 rounded transition-colors ${
+          isInvalid ? 'hover:bg-[#BF0018]/20' : 'hover:bg-gray-300'
+        }`}
         aria-label={`Remove ${patient.id}`}
       >
         <X size={12} />
