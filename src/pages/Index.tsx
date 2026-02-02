@@ -29,7 +29,7 @@ const Index = () => {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-left mb-8">
-          <h1 className="text-4xl font-bold mb-4 text-foreground">Patient Filter Component Example</h1>
+          <h1 className="text-4xl font-bold mb-4 text-foreground">Patient Filter Component behaviour</h1>
           <p className="text-xl text-muted-foreground">
             Filter and search prototype for Q3 release
           </p>

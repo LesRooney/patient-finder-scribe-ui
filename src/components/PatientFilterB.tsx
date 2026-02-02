@@ -209,7 +209,7 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
     <div className="relative">
       <Button
         onClick={handleFilterToggle}
-        className={`flex items-center gap-2 text-[#1A1C1E] border-2 rounded-2xl transition-all duration-200 ${
+        className={`flex items-center gap-2 text-[#1A1C1E] border-2 rounded-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#0070C0] focus:ring-offset-2 ${
           isOpen 
             ? 'bg-[#EEF1F4] border-[#EEF1F4]' 
             : 'bg-[#EEF1F4] border-[#EEF1F4] hover:bg-[#DDE0E5] hover:border-[#DDE0E5]'
@@ -282,19 +282,16 @@ const PatientFilterB: React.FC<PatientFilterBProps> = ({ isOpen, onToggle, onClo
                   <p className="text-xs text-muted-foreground flex-1 pr-4 text-left">
                     Paste, search, or filter up to 15 patients maximum. Press Enter to add individually.
                   </p>
-                  <span className={`text-xs whitespace-nowrap ${selectedPatients.length > 15 ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
-                    {selectedPatients.length > 15 
-                      ? `-${selectedPatients.length - 15} / 15`
-                      : `${selectedPatients.length} / 15`
-                    }
+                  <span className="text-xs whitespace-nowrap text-muted-foreground">
+                    {selectedPatients.length} / 15
                   </span>
                 </div>
               </div>
 
               {selectedPatients.length >= 15 && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-3">
-                  <p className="text-sm text-yellow-800">
-                    You've reached the maximum limit of 15 patients. Please adjust your search.
+                  <p className="text-sm text-yellow-800 text-left">
+                    You have reached the maximum limit of 15 patients.
                   </p>
                 </div>
               )}
