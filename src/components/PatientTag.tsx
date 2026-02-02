@@ -10,11 +10,14 @@ interface PatientTagProps {
 
 const PatientTag: React.FC<PatientTagProps> = ({ patient, onRemove }) => {
   return (
-    <div className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-full text-sm border border-primary/20 hover:bg-primary/20 transition-colors">
+    <div 
+      className="inline-flex items-center gap-1 px-2 rounded text-sm transition-colors bg-[#EEF1F4] hover:bg-[#DDE0E5] text-foreground"
+      style={{ height: '24px', borderRadius: '4px' }}
+    >
       <span className="font-medium">{patient.id}</span>
       <button
         onClick={() => onRemove(patient.id)}
-        className="p-0.5 hover:bg-primary/30 rounded-full transition-colors"
+        className="p-0.5 hover:bg-gray-300 rounded transition-colors"
         aria-label={`Remove ${patient.id}`}
       >
         <X size={12} />
