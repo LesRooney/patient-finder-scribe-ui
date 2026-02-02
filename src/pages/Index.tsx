@@ -1,12 +1,54 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import PatientFilter from '../components/PatientFilter';
 import { mockPatients } from '../data/mockPatients';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+
+type SortField = 'id' | 'country' | null;
+type SortDirection = 'asc' | 'desc';
 
 const Index = () => {
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
   // Use the first 30 patients from the database
-  const examplePatients = mockPatients.slice(0, 30);
+  const examplePatients = useMemo(() => {
+    const patients = mockPatients.slice(0, 30);
+    
+    if (!sortField) return patients;
+    
+    return [...patients].sort((a, b) => {
+      let comparison = 0;
+      
+      if (sortField === 'id') {
+        comparison = a.id.localeCompare(b.id);
+      } else if (sortField === 'country') {
+        comparison = a.country.code.localeCompare(b.country.code);
+      }
+      
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [sortField, sortDirection]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return <ArrowUpDown size={14} className="text-muted-foreground" />;
+    }
+    return sortDirection === 'asc' 
+      ? <ArrowUp size={14} className="text-foreground" />
+      : <ArrowDown size={14} className="text-foreground" />;
+  };
+
   const patientIdList = examplePatients.map(patient => patient.id).join('\n');
 
   const handleCopyPatientIds = async () => {
@@ -58,8 +100,24 @@ const Index = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-left">Patient ID</TableHead>
-                    <TableHead className="text-right">Country</TableHead>
+                    <TableHead className="text-left">
+                      <button 
+                        onClick={() => handleSort('id')}
+                        className="flex items-center gap-1 hover:text-foreground transition-colors"
+                      >
+                        Patient ID
+                        {getSortIcon('id')}
+                      </button>
+                    </TableHead>
+                    <TableHead className="text-left">
+                      <button 
+                        onClick={() => handleSort('country')}
+                        className="flex items-center gap-1 hover:text-foreground transition-colors"
+                      >
+                        Country
+                        {getSortIcon('country')}
+                      </button>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -72,10 +130,10 @@ const Index = () => {
                       >
                         {patient.id}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <span className="text-sm text-muted-foreground">{patient.country.code}</span>
+                      <TableCell className="text-left">
+                        <div className="flex items-center gap-2">
                           <span style={{ fontSize: '20px', lineHeight: '24px' }}>{patient.country.flag}</span>
+                          <span className="text-sm text-muted-foreground">{patient.country.code}</span>
                         </div>
                       </TableCell>
                     </TableRow>

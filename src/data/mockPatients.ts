@@ -10,6 +10,7 @@ export interface Patient {
   dateOfBirth: string;
   status: 'active' | 'inactive';
   country: Country;
+  isValid?: boolean;
 }
 
 // 6 countries with specific prefixes: USA=RG112-, GBR=1001-, FRA=299-, JPN=TK7-, DEU=BN88-, AUS=SYD2024-
@@ -22,98 +23,81 @@ export const countries: Country[] = [
   { code: 'AUS', flag: '🇦🇺', prefix: 'SYD2024-' },
 ];
 
-// Generate patient IDs with country-specific prefixes
-// Total lengths: USA=6, GBR=7, FRA=8, JPN=10, DEU=11, AUS=15
-const generatePatientId = (index: number, country: Country): string => {
-  const targetLengths: Record<string, number> = {
-    'USA': 6,
-    'GBR': 7,
-    'FRA': 8,
-    'JPN': 10,
-    'DEU': 11,
-    'AUS': 15,
-  };
-  
-  const targetLength = targetLengths[country.code] || 8;
-  const prefixLength = country.prefix.length;
-  const suffixLength = targetLength - prefixLength;
+// Generate patient IDs with country-specific prefixes and random suffix lengths (5-10 digits)
+const generatePatientId = (seed: number, country: Country): string => {
+  // Random suffix length between 5 and 10 based on seed
+  const suffixLengths = [5, 6, 7, 8, 9, 10];
+  const suffixLength = suffixLengths[seed % suffixLengths.length];
   
   // Generate numeric suffix padded with zeros
-  const suffix = String(index + 1).padStart(suffixLength, '0');
+  const suffix = String(seed + 1).padStart(suffixLength, '0');
   
   return country.prefix + suffix.slice(0, suffixLength);
 };
 
-export const mockPatients: Patient[] = [
-  // USA patients (RG112-X, 6 chars total)
-  { id: 'RG112-', name: 'John Smith', dateOfBirth: '1985-03-15', status: 'active', country: countries[0] },
-  { id: 'RG1121', name: 'Robert Taylor', dateOfBirth: '1975-12-18', status: 'active', country: countries[0] },
-  { id: 'RG1122', name: 'William Clark', dateOfBirth: '1984-07-19', status: 'active', country: countries[0] },
-  { id: 'RG1123', name: 'Kevin King', dateOfBirth: '1976-01-14', status: 'active', country: countries[0] },
-  { id: 'RG1124', name: 'Gregory Adams', dateOfBirth: '1983-12-03', status: 'active', country: countries[0] },
-  { id: 'RG1125', name: 'Jonathan Cooper', dateOfBirth: '1984-01-17', status: 'active', country: countries[0] },
-  { id: 'RG1126', name: 'Nathan Ward', dateOfBirth: '1977-07-13', status: 'active', country: countries[0] },
-  { id: 'RG1127', name: 'Marcus Watson', dateOfBirth: '1979-03-15', status: 'inactive', country: countries[0] },
-  { id: 'RG1128', name: 'Roy Wood', dateOfBirth: '1990-07-26', status: 'active', country: countries[0] },
-  { id: 'RG1129', name: 'Arthur Perry', dateOfBirth: '1980-11-27', status: 'active', country: countries[0] },
-  
-  // GBR patients (1001-XX, 7 chars total)
-  { id: '1001-01', name: 'Sarah Johnson', dateOfBirth: '1990-07-22', status: 'active', country: countries[1] },
-  { id: '1001-02', name: 'Jennifer Martinez', dateOfBirth: '1989-04-25', status: 'active', country: countries[1] },
-  { id: '1001-03', name: 'Jessica Rodriguez', dateOfBirth: '1991-03-02', status: 'active', country: countries[1] },
-  { id: '1001-04', name: 'Stephanie Wright', dateOfBirth: '1990-09-21', status: 'active', country: countries[1] },
-  { id: '1001-05', name: 'Samantha Baker', dateOfBirth: '1991-02-27', status: 'active', country: countries[1] },
-  { id: '1001-06', name: 'Andrea Reed', dateOfBirth: '1993-03-24', status: 'active', country: countries[1] },
-  { id: '1001-07', name: 'Denise Torres', dateOfBirth: '1992-10-02', status: 'active', country: countries[1] },
-  { id: '1001-08', name: 'Tiffany Brooks', dateOfBirth: '1987-06-04', status: 'active', country: countries[1] },
-  { id: '1001-09', name: 'Deborah Barnes', dateOfBirth: '1982-10-14', status: 'active', country: countries[1] },
-  { id: '1001-10', name: 'Carolyn Powell', dateOfBirth: '1987-02-14', status: 'active', country: countries[1] },
-  
-  // FRA patients (299-XXXX, 8 chars total)
-  { id: '299-0001', name: 'Michael Brown', dateOfBirth: '1978-11-08', status: 'active', country: countries[2] },
-  { id: '299-0002', name: 'Christopher Lee', dateOfBirth: '1981-08-14', status: 'inactive', country: countries[2] },
-  { id: '299-0003', name: 'Daniel Lewis', dateOfBirth: '1977-12-25', status: 'inactive', country: countries[2] },
-  { id: '299-0004', name: 'Thomas Mitchell', dateOfBirth: '1985-04-12', status: 'active', country: countries[2] },
-  { id: '299-0005', name: 'Patrick Nelson', dateOfBirth: '1976-07-09', status: 'active', country: countries[2] },
-  { id: '299-0006', name: 'Ryan Murphy', dateOfBirth: '1980-06-11', status: 'inactive', country: countries[2] },
-  { id: '299-0007', name: 'Justin Peterson', dateOfBirth: '1988-01-28', status: 'active', country: countries[2] },
-  { id: '299-0008', name: 'Donald Kelly', dateOfBirth: '1975-08-29', status: 'active', country: countries[2] },
-  { id: '299-0009', name: 'Gerald Ross', dateOfBirth: '1978-01-05', status: 'active', country: countries[2] },
-  { id: '299-0010', name: 'Wayne Long', dateOfBirth: '1976-05-01', status: 'active', country: countries[2] },
-  
-  // JPN patients (TK7-XXXXXX, 10 chars total)
-  { id: 'TK7-000001', name: 'Emily Davis', dateOfBirth: '1992-01-30', status: 'inactive', country: countries[3] },
-  { id: 'TK7-000002', name: 'Amanda White', dateOfBirth: '1993-06-07', status: 'active', country: countries[3] },
-  { id: 'TK7-000003', name: 'Ashley Walker', dateOfBirth: '1988-08-16', status: 'active', country: countries[3] },
-  { id: 'TK7-000004', name: 'Rachel Green', dateOfBirth: '1992-06-18', status: 'active', country: countries[3] },
-  { id: 'TK7-000005', name: 'Kimberly Hill', dateOfBirth: '1989-11-14', status: 'active', country: countries[3] },
-  { id: 'TK7-000006', name: 'Cynthia Bailey', dateOfBirth: '1986-08-19', status: 'active', country: countries[3] },
-  { id: 'TK7-000007', name: 'Crystal Gray', dateOfBirth: '1983-05-16', status: 'active', country: countries[3] },
-  { id: 'TK7-000008', name: 'Angela Sanders', dateOfBirth: '1991-12-12', status: 'active', country: countries[3] },
-  { id: 'TK7-000009', name: 'Beverly Henderson', dateOfBirth: '1989-03-18', status: 'active', country: countries[3] },
-  { id: 'TK7-000010', name: 'Joyce Patterson', dateOfBirth: '1992-08-16', status: 'active', country: countries[3] },
-  
-  // DEU patients (BN88-XXXXXX, 11 chars total)
-  { id: 'BN88-00001', name: 'David Wilson', dateOfBirth: '1983-05-12', status: 'active', country: countries[4] },
-  { id: 'BN88-00002', name: 'James Thompson', dateOfBirth: '1979-02-28', status: 'active', country: countries[4] },
-  { id: 'BN88-00003', name: 'Matthew Hall', dateOfBirth: '1982-11-29', status: 'active', country: countries[4] },
-  { id: 'BN88-00004', name: 'Brandon Scott', dateOfBirth: '1979-08-22', status: 'active', country: countries[4] },
-  { id: 'BN88-00005', name: 'Steven Carter', dateOfBirth: '1982-05-06', status: 'active', country: countries[4] },
-  { id: 'BN88-00006', name: 'Eric Rivera', dateOfBirth: '1990-12-07', status: 'active', country: countries[4] },
-  { id: 'BN88-00007', name: 'Carl Ramirez', dateOfBirth: '1981-09-08', status: 'active', country: countries[4] },
-  { id: 'BN88-00008', name: 'Keith Price', dateOfBirth: '1984-02-20', status: 'active', country: countries[4] },
-  { id: 'BN88-00009', name: 'Roger Coleman', dateOfBirth: '1985-06-23', status: 'inactive', country: countries[4] },
-  { id: 'BN88-00010', name: 'Lawrence Hughes', dateOfBirth: '1983-12-03', status: 'active', country: countries[4] },
-  
-  // AUS patients (SYD2024-XXXXXX, 15 chars total)
-  { id: 'SYD2024-000001', name: 'Lisa Anderson', dateOfBirth: '1987-09-03', status: 'active', country: countries[5] },
-  { id: 'SYD2024-000002', name: 'Maria Garcia', dateOfBirth: '1986-10-11', status: 'active', country: countries[5] },
-  { id: 'SYD2024-000003', name: 'Nicole Young', dateOfBirth: '1994-05-08', status: 'active', country: countries[5] },
-  { id: 'SYD2024-000004', name: 'Melissa Turner', dateOfBirth: '1988-10-15', status: 'inactive', country: countries[5] },
-  { id: 'SYD2024-000005', name: 'Heather Parker', dateOfBirth: '1987-09-30', status: 'active', country: countries[5] },
-  { id: 'SYD2024-000006', name: 'Monica Foster', dateOfBirth: '1985-04-25', status: 'active', country: countries[5] },
-  { id: 'SYD2024-000007', name: 'Vanessa James', dateOfBirth: '1994-11-21', status: 'active', country: countries[5] },
-  { id: 'SYD2024-000008', name: 'Brenda Bennett', dateOfBirth: '1986-04-07', status: 'active', country: countries[5] },
-  { id: 'SYD2024-000009', name: 'Shirley Jenkins', dateOfBirth: '1993-09-10', status: 'active', country: countries[5] },
-  { id: 'SYD2024-000010', name: 'Virginia Flores', dateOfBirth: '1988-04-20', status: 'active', country: countries[5] },
+// Randomized country assignments (mixed order)
+const countryAssignments = [
+  0, 3, 1, 5, 2, 4, 0, 2, 5, 1, // First 10
+  3, 4, 0, 1, 5, 2, 3, 0, 4, 1, // Second 10
+  2, 5, 3, 4, 0, 1, 2, 3, 5, 4, // Third 10
+  0, 1, 2, 3, 4, 5, 0, 1, 2, 3, // Fourth 10
+  4, 5, 0, 1, 2, 3, 4, 5, 0, 1, // Fifth 10
+  2, 3, 4, 5, 0, 1, 2, 3, 4, 5, // Sixth 10
 ];
+
+const names = [
+  'John Smith', 'Sarah Johnson', 'Michael Brown', 'Emily Davis', 'David Wilson',
+  'Lisa Anderson', 'Robert Taylor', 'Jennifer Martinez', 'Christopher Lee', 'Amanda White',
+  'James Thompson', 'Maria Garcia', 'Daniel Lewis', 'Ashley Walker', 'Matthew Hall',
+  'Nicole Young', 'Jessica Rodriguez', 'Rachel Green', 'Brandon Scott', 'Melissa Turner',
+  'William Clark', 'Stephanie Wright', 'Thomas Mitchell', 'Kimberly Hill', 'Steven Carter',
+  'Heather Parker', 'Kevin King', 'Samantha Baker', 'Patrick Nelson', 'Cynthia Bailey',
+  'Gregory Adams', 'Andrea Reed', 'Ryan Murphy', 'Crystal Gray', 'Eric Rivera',
+  'Monica Foster', 'Jonathan Cooper', 'Denise Torres', 'Justin Peterson', 'Angela Sanders',
+  'Carl Ramirez', 'Vanessa James', 'Nathan Ward', 'Tiffany Brooks', 'Donald Kelly',
+  'Beverly Henderson', 'Keith Price', 'Brenda Bennett', 'Gerald Ross', 'Joyce Patterson',
+  'Marcus Watson', 'Deborah Barnes', 'Wayne Long', 'Shirley Jenkins', 'Roger Coleman',
+  'Virginia Flores', 'Roy Wood', 'Carolyn Powell', 'Lawrence Hughes', 'Arthur Perry',
+];
+
+const dates = [
+  '1985-03-15', '1990-07-22', '1978-11-08', '1992-01-30', '1983-05-12',
+  '1987-09-03', '1975-12-18', '1989-04-25', '1981-08-14', '1993-06-07',
+  '1979-02-28', '1986-10-11', '1977-12-25', '1988-08-16', '1982-11-29',
+  '1994-05-08', '1991-03-02', '1992-06-18', '1979-08-22', '1988-10-15',
+  '1984-07-19', '1990-09-21', '1985-04-12', '1989-11-14', '1982-05-06',
+  '1987-09-30', '1976-01-14', '1991-02-27', '1976-07-09', '1986-08-19',
+  '1983-12-03', '1993-03-24', '1980-06-11', '1983-05-16', '1990-12-07',
+  '1985-04-25', '1984-01-17', '1992-10-02', '1988-01-28', '1991-12-12',
+  '1981-09-08', '1994-11-21', '1977-07-13', '1987-06-04', '1975-08-29',
+  '1989-03-18', '1984-02-20', '1986-04-07', '1978-01-05', '1992-08-16',
+  '1979-03-15', '1982-10-14', '1976-05-01', '1993-09-10', '1985-06-23',
+  '1988-04-20', '1990-07-26', '1987-02-14', '1983-12-03', '1980-11-27',
+];
+
+const statuses: ('active' | 'inactive')[] = [
+  'active', 'active', 'active', 'inactive', 'active',
+  'active', 'active', 'active', 'inactive', 'active',
+  'active', 'active', 'inactive', 'active', 'active',
+  'active', 'active', 'active', 'active', 'inactive',
+  'active', 'active', 'active', 'active', 'active',
+  'active', 'active', 'active', 'active', 'active',
+  'active', 'active', 'inactive', 'active', 'active',
+  'active', 'active', 'active', 'active', 'active',
+  'active', 'active', 'active', 'active', 'active',
+  'active', 'active', 'active', 'active', 'active',
+  'inactive', 'active', 'active', 'active', 'inactive',
+  'active', 'active', 'active', 'active', 'active',
+];
+
+export const mockPatients: Patient[] = Array.from({ length: 60 }, (_, i) => {
+  const countryIndex = countryAssignments[i];
+  const country = countries[countryIndex];
+  return {
+    id: generatePatientId(i, country),
+    name: names[i],
+    dateOfBirth: dates[i],
+    status: statuses[i],
+    country: country,
+  };
+});
