@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import PatientFilter from '../components/PatientFilter';
 import { mockPatients } from '../data/mockPatients';
@@ -11,10 +10,22 @@ type SortDirection = 'asc' | 'desc';
 const Index = () => {
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [activeFilterA, setActiveFilterA] = useState<string[]>([]);
+  const [activeFilterB, setActiveFilterB] = useState<string[]>([]);
 
-  // Use the first 30 patients from the database
+  // Use the first 30 patients from the database, then apply filters
   const examplePatients = useMemo(() => {
-    const patients = mockPatients.slice(0, 30);
+    let patients = mockPatients.slice(0, 30);
+    
+    // Apply filter A if active
+    if (activeFilterA.length > 0) {
+      patients = patients.filter(p => activeFilterA.includes(p.id));
+    }
+    
+    // Apply filter B if active
+    if (activeFilterB.length > 0) {
+      patients = patients.filter(p => activeFilterB.includes(p.id));
+    }
     
     if (!sortField) return patients;
     
@@ -29,7 +40,23 @@ const Index = () => {
       
       return sortDirection === 'asc' ? comparison : -comparison;
     });
-  }, [sortField, sortDirection]);
+  }, [sortField, sortDirection, activeFilterA, activeFilterB]);
+
+  const handleFilterApply = (filterType: 'A' | 'B', patientIds: string[]) => {
+    if (filterType === 'A') {
+      setActiveFilterA(patientIds);
+    } else {
+      setActiveFilterB(patientIds);
+    }
+  };
+
+  const handleFilterClear = (filterType: 'A' | 'B') => {
+    if (filterType === 'A') {
+      setActiveFilterA([]);
+    } else {
+      setActiveFilterB([]);
+    }
+  };
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -78,7 +105,10 @@ const Index = () => {
         </div>
 
         <div className="mb-8">
-          <PatientFilter />
+          <PatientFilter 
+            onFilterApply={handleFilterApply}
+            onFilterClear={handleFilterClear}
+          />
         </div>
 
 
@@ -109,7 +139,7 @@ const Index = () => {
                         {getSortIcon('id')}
                       </button>
                     </TableHead>
-                    <TableHead className="text-left">
+                    <TableHead className="text-left" style={{ paddingLeft: '60px' }}>
                       <button 
                         onClick={() => handleSort('country')}
                         className="flex items-center gap-1 hover:text-foreground transition-colors"
@@ -121,23 +151,31 @@ const Index = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {examplePatients.map(patient => (
-                    <TableRow key={patient.id} className="hover:bg-gray-50">
-                      <TableCell 
-                        className="font-mono text-sm cursor-pointer select-text hover:bg-blue-50 transition-colors text-left"
-                        onClick={() => handleCopyPatientId(patient.id)}
-                        title="Click to copy patient ID"
-                      >
-                        {patient.id}
-                      </TableCell>
-                      <TableCell className="text-left">
-                        <div className="flex items-center gap-2">
-                          <span style={{ fontSize: '20px', lineHeight: '24px' }}>{patient.country.flag}</span>
-                          <span className="text-sm text-muted-foreground">{patient.country.code}</span>
-                        </div>
+                  {examplePatients.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                        No patients match the current filter criteria.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    examplePatients.map(patient => (
+                      <TableRow key={patient.id} className="hover:bg-gray-50">
+                        <TableCell 
+                          className="font-mono text-sm cursor-pointer select-text hover:bg-blue-50 transition-colors text-left"
+                          onClick={() => handleCopyPatientId(patient.id)}
+                          title="Click to copy patient ID"
+                        >
+                          {patient.id}
+                        </TableCell>
+                        <TableCell className="text-left" style={{ paddingLeft: '60px' }}>
+                          <div className="flex items-center gap-2">
+                            <span style={{ fontSize: '20px', lineHeight: '24px' }}>{patient.country.flag}</span>
+                            <span className="text-sm text-muted-foreground">{patient.country.code}</span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
