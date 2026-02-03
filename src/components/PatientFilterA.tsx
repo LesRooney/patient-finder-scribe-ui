@@ -13,9 +13,21 @@ interface PatientFilterAProps {
   isOpen: boolean;
   onToggle: () => void;
   onClose: () => void;
+  onApply: (patientIds: string[]) => void;
+  onClear: () => void;
+  appliedCount: number;
+  hasActiveFilter: boolean;
 }
 
-const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClose }) => {
+const PatientFilterA: React.FC<PatientFilterAProps> = ({ 
+  isOpen, 
+  onToggle, 
+  onClose, 
+  onApply, 
+  onClear,
+  appliedCount,
+  hasActiveFilter 
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPatients, setSelectedPatients] = useState<SelectedPatient[]>([]);
   const [suggestions, setSuggestions] = useState<Patient[]>([]);
@@ -110,6 +122,12 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
       setShowSuggestions(false);
       setHasInteracted(false);
     }
+  };
+
+  const handleClearFilter = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedPatients([]);
+    onClear();
   };
 
   const handleAddPatientById = (id: string) => {
@@ -229,8 +247,11 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
   };
 
   const handleApply = () => {
-    console.log('Applied filters with patients A:', selectedPatients.map(p => p.id));
-    onClose();
+    // Only pass valid patient IDs
+    const validPatientIds = selectedPatients
+      .filter(p => !p.isInvalid)
+      .map(p => p.id);
+    onApply(validPatientIds);
   };
 
   const handleClearAll = () => {
@@ -250,14 +271,15 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
 
   const dynamicHeight = searchAreaHeight;
   const overLimit = selectedPatients.length - maxPatients;
+  const isPressed = isOpen || hasActiveFilter;
 
   return (
     <div className="relative">
       <Button
         onClick={handleFilterToggle}
         className={`flex items-center gap-2 text-[#1A1C1E] border-2 rounded-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#0070C0] focus:ring-offset-2 ${
-          isOpen 
-            ? 'bg-[#EEF1F4] border-[#EEF1F4]' 
+          isPressed 
+            ? 'bg-[#E7F2FE] border-[#0070C0]' 
             : 'bg-[#EEF1F4] border-[#EEF1F4] hover:bg-[#DDE0E5] hover:border-[#DDE0E5]'
         }`}
         variant="ghost"
@@ -267,10 +289,19 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
           size={16} 
           className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
         />
-        {selectedPatients.length > 0 && (
-          <span className="ml-2 bg-white text-[#1A1C1E] px-2 py-0.5 rounded-full text-xs font-medium">
-            {selectedPatients.length}
-          </span>
+        {appliedCount > 0 && (
+          <>
+            <span className="ml-1 bg-[#0070C0] text-white px-2 py-0.5 rounded-full text-xs font-medium">
+              {appliedCount}
+            </span>
+            <button
+              onClick={handleClearFilter}
+              className="ml-1 inline-flex items-center justify-center w-4 h-4 bg-[#0070C0] hover:bg-[#005FAB] rounded-full transition-colors"
+              aria-label="Clear filter"
+            >
+              <X size={10} className="text-white" />
+            </button>
+          </>
         )}
       </Button>
 
@@ -333,10 +364,7 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({ isOpen, onToggle, onClo
                   </p>
                   <span className="text-xs whitespace-nowrap">
                     {overLimit > 0 ? (
-                      <>
-                        <span className="text-muted-foreground">{selectedPatients.length} / 15 </span>
-                        <span className="text-[#BF0018] font-medium">-{overLimit}</span>
-                      </>
+                      <span className="text-[#BF0018] font-medium">-{overLimit} / 15</span>
                     ) : (
                       <span className="text-muted-foreground">{selectedPatients.length} / 15</span>
                     )}
