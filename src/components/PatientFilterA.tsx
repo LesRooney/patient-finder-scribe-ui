@@ -17,6 +17,7 @@ interface PatientFilterAProps {
   onClear: () => void;
   appliedCount: number;
   hasActiveFilter: boolean;
+  appliedPatientIds: string[];
 }
 
 const PatientFilterA: React.FC<PatientFilterAProps> = ({ 
@@ -26,7 +27,8 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({
   onApply, 
   onClear,
   appliedCount,
-  hasActiveFilter 
+  hasActiveFilter,
+  appliedPatientIds 
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPatients, setSelectedPatients] = useState<SelectedPatient[]>([]);
@@ -284,24 +286,31 @@ const PatientFilterA: React.FC<PatientFilterAProps> = ({
         }`}
         variant="ghost"
       >
-        Patient ID A
-        <ChevronDown 
-          size={16} 
-          className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
-        />
-        {appliedCount > 0 && (
+        {hasActiveFilter && !isOpen ? (
           <>
-            <span className="ml-1 bg-[#0070C0] text-white px-2 py-0.5 rounded-full text-xs font-medium">
-              {appliedCount}
+            <span>Patient ID A:</span>
+            <span className="text-[#0070C0]">
+              {appliedPatientIds[0]?.substring(0, 7)}{appliedPatientIds[0]?.length > 7 ? '…' : ''}
+              {appliedCount > 1 && `, +${appliedCount - 1}`}
             </span>
-            <button
-              onClick={handleClearFilter}
-              className="ml-1 inline-flex items-center justify-center w-4 h-4 bg-[#0070C0] hover:bg-[#005FAB] rounded-full transition-colors"
-              aria-label="Clear filter"
-            >
-              <X size={10} className="text-white" />
-            </button>
           </>
+        ) : (
+          <>
+            Patient ID A
+            <ChevronDown 
+              size={16} 
+              className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
+            />
+          </>
+        )}
+        {hasActiveFilter && !isOpen && (
+          <button
+            onClick={handleClearFilter}
+            className="ml-1 inline-flex items-center justify-center w-4 h-4 bg-[#0070C0] hover:bg-[#005FAB] rounded-full transition-colors"
+            aria-label="Clear filter"
+          >
+            <X size={10} className="text-white" />
+          </button>
         )}
       </Button>
 
