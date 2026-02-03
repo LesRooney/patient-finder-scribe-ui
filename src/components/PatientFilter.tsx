@@ -57,6 +57,7 @@ const PatientFilter: React.FC<PatientFilterProps> = ({ onFilterApply, onFilterCl
           onClear={handleClearA}
           appliedCount={appliedFilterA.length}
           hasActiveFilter={appliedFilterA.length > 0}
+          appliedPatientIds={appliedFilterA}
         />
         <PatientFilterB 
           isOpen={openFilter === 'B'}
@@ -66,6 +67,7 @@ const PatientFilter: React.FC<PatientFilterProps> = ({ onFilterApply, onFilterCl
           onClear={handleClearB}
           appliedCount={appliedFilterB.length}
           hasActiveFilter={appliedFilterB.length > 0}
+          appliedPatientIds={appliedFilterB}
         />
       </div>
     </div>
